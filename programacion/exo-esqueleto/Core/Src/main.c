@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
-#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -62,7 +61,9 @@ typedef struct{
 
 /* USER CODE BEGIN PV */
 static uint8_t buffer = 0;
+#ifdef UART_ENABLE
 static volatile enum_buffer_status buffer_status = empty;
+#endif
 static st_step_position position = {0};
 uint16_t Steps[4] = {GPIO_PIN_0, GPIO_PIN_2, GPIO_PIN_1, GPIO_PIN_3};
 /* USER CODE END PV */
@@ -70,13 +71,10 @@ uint16_t Steps[4] = {GPIO_PIN_0, GPIO_PIN_2, GPIO_PIN_1, GPIO_PIN_3};
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-#if 0
-static void move_forward_LEGACY(void);
-static void move_backward_LEGACY(void);
-#endif
-static void move_forward(void);
-static void move_backward(void);
+#ifdef UART_ENABLE
 static enum_moving_action compare_byte(void);
+#endif
+static void step_machine(enum_moving_action motion, uint32_t * steps_left);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -112,8 +110,6 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_USART3_UART_Init();
-  HAL_UART_Receive_IT(&huart3, &rx_byte, sizeof(rx_byte));
   /* USER CODE BEGIN 2 */
   static uint8_t op_has_started = NO;
   enum_moving_action moving_action = stopped;
@@ -124,24 +120,22 @@ int main(void)
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if(full == buffer_status)
+
+	  if(op_has_started){
+		  if(stopped != steps_to_go){
+			  step_machine(moving_action, &steps_to_go);
+		  }
+		  else{
+			  op_has_started = NO;
+		  }
+	  }
+	  else
 	  {
-		  if(op_has_started){
-			  if(done){
-
-				  op_has_started = NO;
-
-			  }
-			  else{
-				  step_machine(moving_action, &steps_to_go);
-			  }
-		  }
-		  else
-		  {
-			  moving_action = compare_byte();
-			  steps_to_go = 200;
-			  op_has_started = YES;
-		  }
+		  moving_action = (moving_forward == moving_action) ? moving_backward : moving_forward;
+		  steps_to_go = 200;
+#ifdef PLAY
+		  op_has_started = YES;
+#endif
 	  }
 
     /* USER CODE END WHILE */
@@ -188,9 +182,12 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
+#ifdef UART_ENABLE
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	//waits until buffer is empty again
-	if(isbuff_empty){
+	if(empty == buffer_status){
 		buffer_status = full;
 	}
 }
@@ -211,143 +208,45 @@ static enum_moving_action compare_byte(void)
 	  }
 }
 
-#if 0
-static void move_forward_LEGACY(void){
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(20);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(20);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(20);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(20);
-}
-
-static void move_backward_LEGACY(void){
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	  HAL_Delay(20);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	  HAL_Delay(20);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(20);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	  HAL_Delay(20);
-}
 #endif
-static void move_forward(void)
+
+static void step_machine(enum_moving_action motion, uint32_t * steps_left)
 {
-	// ROUTINE 0-2-1-3-0
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(miliseconds);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-	  HAL_Delay(miliseconds);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(miliseconds);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	  HAL_Delay(miliseconds);
-
-}
-
-static void step_z(uint8_t pin){
-
-}
-
-static void move_backward(void)
-{
-	// ROUTINE 1-2-0-3-1-2-0
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_Delay(miliseconds);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_SET);
-	  HAL_Delay(miliseconds);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_SET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_2, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_RESET);
-	  HAL_Delay(miliseconds);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_0, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_1, GPIO_PIN_RESET);
-	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_3, GPIO_PIN_SET);
-	  HAL_Delay(miliseconds);
-}
-
-static void mcal_move_bw()
-{
-	GPIOA->BSRR = GPIO_PIN_1;
-	HAL_Delay(miliseconds);
-	GPIOA->BSRR = GPIO_PIN_2;
-	HAL_Delay(miliseconds);
-	GPIOA->BSRR = GPIO_PIN_0;
-	HAL_Delay(miliseconds);
-	GPIOA->BSRR = GPIO_PIN_3;
-	HAL_Delay(miliseconds);
-}
-
-static void mcal_move_fw()
-{
-	GPIOA->BSRR = GPIO_PIN_0;
-	HAL_Delay(miliseconds);
-	GPIOA->BSRR = GPIO_PIN_2;
-	HAL_Delay(miliseconds);
-	GPIOA->BSRR = GPIO_PIN_1;
-	HAL_Delay(miliseconds);
-	GPIOA->BSRR = GPIO_PIN_3;
-	HAL_Delay(miliseconds);
-}
-
-static void step_machine(enum_moving_action motion, uint32_t * steps_left){
 
 	if(*steps_left > 0)
 	{
 		if(moving_forward == motion)
 		{
-			position.step = (position.step < 4) ? (position.step + 1) : 0;
-			GPIOA->BSRR = Steps[position.step];
+			if(position.step < 4)
+			{
+				GPIOA->ODR = Steps[position.step];
+				position.step++;
+			}
+			else
+			{
+				position.step = 0;
+				GPIOA->ODR = Steps[0];
+			}
 		}
 		else if(moving_backward == motion){
-			position.step = (position.step > 0) ? (position.step - 1) : 4;
-			GPIOA->BSRR = Steps[position.step - 1];
+			if(position.step > 0)
+			{
+				position.step--;
+				GPIOA->ODR = Steps[position.step];
+			}
+			else
+			{
+				position.step = 3;
+				GPIOA->ODR = Steps[3];
+			}
 		}
 		else
 		{
 			*steps_left = 0;
 		}
 
-		*steps_left--;
+		*steps_left = *steps_left - 1;
+		HAL_Delay(miliseconds);
 	}
 }
 
