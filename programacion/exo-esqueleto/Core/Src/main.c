@@ -1,23 +1,24 @@
 /* USER CODE BEGIN Header */
 /**
-  ******************************************************************************
-  * @file           : main.c
-  * @brief          : Main program body
-  ******************************************************************************
-  * @attention
-  *
-  * Copyright (c) 2023 STMicroelectronics.
-  * All rights reserved.
-  *
-  * This software is licensed under terms that can be found in the LICENSE file
-  * in the root directory of this software component.
-  * If no LICENSE file comes with this software, it is provided AS-IS.
-  *
-  ******************************************************************************
-  */
+ ******************************************************************************
+ * @file           : main.c
+ * @brief          : Main program body
+ ******************************************************************************
+ * @attention
+ *
+ * Copyright (c) 2023 STMicroelectronics.
+ * All rights reserved.
+ *
+ * This software is licensed under terms that can be found in the LICENSE file
+ * in the root directory of this software component.
+ * If no LICENSE file comes with this software, it is provided AS-IS.
+ *
+ ******************************************************************************
+ */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -39,7 +40,7 @@ typedef enum{
 }enum_moving_action;
 
 typedef struct{
-	uint32_t absolute_pos;
+	int32_t absolute_pos;
 	uint16_t step;
 }st_step_position;
 
@@ -47,9 +48,11 @@ typedef struct{
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define miliseconds 1
+#define UART_ENABLE
+#define milliseconds 2
 #define YES 1
 #define NO 0
+#define PLAY
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,8 +67,7 @@ static uint8_t buffer = 0;
 #ifdef UART_ENABLE
 static volatile enum_buffer_status buffer_status = empty;
 #endif
-static st_step_position position = {0};
-uint16_t Steps[4] = {GPIO_PIN_0, GPIO_PIN_2, GPIO_PIN_1, GPIO_PIN_3};
+static const uint16_t Steps[8] = {GPIO_PIN_3, 0x09, GPIO_PIN_0, 0x05, GPIO_PIN_2, 0x06, GPIO_PIN_1, 0x0A};
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -74,7 +76,7 @@ void SystemClock_Config(void);
 #ifdef UART_ENABLE
 static enum_moving_action compare_byte(void);
 #endif
-static void step_machine(enum_moving_action motion, uint32_t * steps_left);
+static void step_machine(enum_moving_action motion, st_step_position * position);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -110,38 +112,44 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
+  MX_USART3_UART_Init();
   /* USER CODE BEGIN 2 */
-  static uint8_t op_has_started = NO;
-  enum_moving_action moving_action = stopped;
-  static uint32_t steps_to_go = 0;
+	static uint8_t op_has_started = NO;
+	static enum_moving_action moving_action = stopped;
+	static st_step_position position = {0};
+	uint16_t steps_to_go = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+	while (1)
+	{
+		if(full == buffer_status)
+		{
+			if(op_has_started){
+				if(steps_to_go > 0){
+					step_machine(moving_action, &position);
+					steps_to_go--;
+					HAL_Delay(milliseconds);
+				}
+				else{
+					op_has_started = NO;
+					HAL_Delay(250);
+				}
+			}
+			else
+			{
+				moving_action = compare_byte();
+				steps_to_go = 1200;
+				op_has_started = YES;
+			}
 
-	  if(op_has_started){
-		  if(stopped != steps_to_go){
-			  step_machine(moving_action, &steps_to_go);
-		  }
-		  else{
-			  op_has_started = NO;
-		  }
-	  }
-	  else
-	  {
-		  moving_action = (moving_forward == moving_action) ? moving_backward : moving_forward;
-		  steps_to_go = 200;
-#ifdef PLAY
-		  op_has_started = YES;
-#endif
-	  }
+		}
 
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+	}
   /* USER CODE END 3 */
 }
 
@@ -190,64 +198,63 @@ void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	if(empty == buffer_status){
 		buffer_status = full;
 	}
+	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 }
 
 static enum_moving_action compare_byte(void)
 {
-	  //compare byte
-	  switch(buffer){
-	  case 'f':
-		  return moving_forward;
-		  break;
-	  case 'b':
-		  return moving_backward;
-		  break;
-	  default:
-		  return stopped;
-		  break;
-	  }
+	//compare byte
+	switch(buffer){
+	case 'f':
+		return moving_forward;
+		break;
+	case 'b':
+		return moving_backward;
+		break;
+	default:
+		return stopped;
+		break;
+	}
 }
 
 #endif
 
-static void step_machine(enum_moving_action motion, uint32_t * steps_left)
+static void step_machine(enum_moving_action motion, st_step_position * position)
 {
-
-	if(*steps_left > 0)
+	if(moving_forward == motion)
 	{
-		if(moving_forward == motion)
+		if((position->step) < 8)
 		{
-			if(position.step < 4)
-			{
-				GPIOA->ODR = Steps[position.step];
-				position.step++;
-			}
-			else
-			{
-				position.step = 0;
-				GPIOA->ODR = Steps[0];
-			}
-		}
-		else if(moving_backward == motion){
-			if(position.step > 0)
-			{
-				position.step--;
-				GPIOA->ODR = Steps[position.step];
-			}
-			else
-			{
-				position.step = 3;
-				GPIOA->ODR = Steps[3];
-			}
+			GPIOA->ODR = Steps[position->step];
 		}
 		else
 		{
-			*steps_left = 0;
+			position->step = 0;
+			GPIOA->ODR = Steps[0];
 		}
-
-		*steps_left = *steps_left - 1;
-		HAL_Delay(miliseconds);
+		position->step++;
+		position->absolute_pos++;
 	}
+	else if(moving_backward == motion)
+	{
+
+		if(position->step > 0)
+		{
+			position->step--;
+			GPIOA->ODR = Steps[position->step];
+		}
+		else
+		{
+			position->step = 7;
+			GPIOA->ODR = Steps[7];
+		}
+		position->absolute_pos--;
+	}
+	else
+	{
+		GPIOA->ODR = 0;
+	}
+
 }
 
 /* USER CODE END 4 */
@@ -259,11 +266,11 @@ static void step_machine(enum_moving_action motion, uint32_t * steps_left)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+	/* User can add his own implementation to report the HAL error return state */
+	__disable_irq();
+	while (1)
+	{
+	}
   /* USER CODE END Error_Handler_Debug */
 }
 
@@ -278,7 +285,7 @@ void Error_Handler(void)
 void assert_failed(uint8_t *file, uint32_t line)
 {
   /* USER CODE BEGIN 6 */
-  /* User can add his own implementation to report the file name and line number,
+	/* User can add his own implementation to report the file name and line number,
      ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
   /* USER CODE END 6 */
 }
