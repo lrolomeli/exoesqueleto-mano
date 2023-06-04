@@ -8,7 +8,7 @@
  *
  * Copyright (c) 2023 STMicroelectronics.
  * All rights reserved.
- *
+                                              *
  * This software is licensed under terms that can be found in the LICENSE file
  * in the root directory of this software component.
  * If no LICENSE file comes with this software, it is provided AS-IS.
@@ -48,7 +48,7 @@ typedef struct{
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define UART_ENABLE
+//  xxx xxxx xx  x                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        #define UART_ENABLE
 #define milliseconds 2
 #define YES 1
 #define NO 0
@@ -124,7 +124,11 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
+#ifdef UART_ENABLE
 		if(full == buffer_status)
+#else
+		if(1)
+#endif
 		{
 			if(op_has_started){
 				if(steps_to_go > 0){
@@ -139,8 +143,12 @@ int main(void)
 			}
 			else
 			{
+#ifdef UART_ENABLE
 				moving_action = compare_byte();
-				steps_to_go = 1200;
+#else
+				moving_action = (moving_action == moving_backward) ? moving_forward : moving_backward;
+#endif
+				steps_to_go = 400;
 				op_has_started = YES;
 			}
 
