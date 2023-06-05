@@ -18,6 +18,7 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
+#include "tim.h"
 #include "usart.h"
 #include "gpio.h"
 
@@ -44,15 +45,23 @@ typedef struct{
 	uint16_t step;
 }st_step_position;
 
+typedef enum{
+	full_step,
+	half_step,
+	quarter_step,
+	eigth_step,
+	sixteen_step
+}enum_stepping;
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//  xxx xxxx xx  x                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        #define UART_ENABLE
+#define TESTING_MOTOR
 #define milliseconds 2
 #define YES 1
 #define NO 0
-#define PLAY
+#define FINISH 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -64,19 +73,20 @@ typedef struct{
 
 /* USER CODE BEGIN PV */
 static uint8_t buffer = 0;
-#ifdef UART_ENABLE
+static volatile uint8_t flag = 0;
+static uint32_t steps_to_go = 0;
 static volatile enum_buffer_status buffer_status = empty;
-#endif
-static const uint16_t Steps[8] = {GPIO_PIN_3, 0x09, GPIO_PIN_0, 0x05, GPIO_PIN_2, 0x06, GPIO_PIN_1, 0x0A};
+const enum_stepping stepping = full_step;
+const uint8_t ack[] = "\rReset\n";
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-#ifdef UART_ENABLE
 static enum_moving_action compare_byte(void);
-#endif
-static void step_machine(enum_moving_action motion, st_step_position * position);
+static void set_pwm(uint16_t pwm);
+static uint8_t send_step_pulses(st_step_position * position, enum_moving_action mov_act);
+static void one_second_pwm(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -113,46 +123,60 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+#ifndef TESTING_MOTOR
 	static uint8_t op_has_started = NO;
+#endif
 	static enum_moving_action moving_action = stopped;
 	static st_step_position position = {0};
-	uint16_t steps_to_go = 0;
+	uint16_t steps = 2000;
+
+	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
+	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_1);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_2);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_3);
+	HAL_TIM_PWM_Start(&htim2, TIM_CHANNEL_4);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-#ifdef UART_ENABLE
 		if(full == buffer_status)
-#else
-		if(1)
-#endif
 		{
-			if(op_has_started){
-				if(steps_to_go > 0){
-					step_machine(moving_action, &position);
-					steps_to_go--;
-					HAL_Delay(milliseconds);
-				}
-				else{
-					op_has_started = NO;
-					HAL_Delay(250);
-				}
-			}
-			else
-			{
-#ifdef UART_ENABLE
-				moving_action = compare_byte();
-#else
-				moving_action = (moving_action == moving_backward) ? moving_forward : moving_backward;
-#endif
-				steps_to_go = 400;
+			moving_action = compare_byte();
+			if(moving_action != stopped){
+				steps_to_go = steps << stepping;
+#ifndef TESTING_MOTOR
 				op_has_started = YES;
+#endif
+				buffer = 0;
 			}
-
 		}
+
+		if(flag)
+		{
+#ifndef TESTING_MOTOR
+			if(op_has_started)
+			{
+				if(send_step_pulses(&position, moving_action) == FINISH)
+				{
+					op_has_started = NO;
+				}
+			}
+#else
+			send_step_pulses(&position, moving_forward);
+			steps_to_go=1;
+#endif
+
+			one_second_pwm();
+			flag = 0;
+		}
+
 
     /* USER CODE END WHILE */
 
@@ -201,22 +225,60 @@ void SystemClock_Config(void)
 
 #ifdef UART_ENABLE
 
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+	switch(GPIO_Pin)
+	{
+	case GPIO_PIN_5:
+		HAL_UART_Transmit(&huart3, (const uint8_t *) ack, sizeof(ack), 100);
+		break;
+	case GPIO_PIN_6:
+		break;
+	case GPIO_PIN_7:
+		break;
+	case GPIO_PIN_8:
+		break;
+	case GPIO_PIN_9:
+		break;
+	default:
+		break;
+	}
+}
+
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	//waits until buffer is empty again
 	if(empty == buffer_status){
 		buffer_status = full;
 	}
-	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
+{
+	if(htim->Instance == TIM3)
+	{
+		if(~flag)
+		{
+			flag = 1;
+		}
+	}
 }
 
 static enum_moving_action compare_byte(void)
 {
+	uint8_t temp_buff;
+	if(buffer == 'f' || buffer == 'b')
+	{
+		temp_buff = buffer;
+		//HAL_UART_Transmit(&huart3, (const uint8_t *) &buffer, sizeof(buffer), 100);
+	}
+	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 	//compare byte
-	switch(buffer){
+	switch(temp_buff){
 	case 'f':
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
 		return moving_forward;
 		break;
 	case 'b':
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 		return moving_backward;
 		break;
 	default:
@@ -225,45 +287,57 @@ static enum_moving_action compare_byte(void)
 	}
 }
 
+static void set_pwm(uint16_t pwm){
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_1, pwm);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_2, pwm);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_3, pwm);
+	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, pwm);
+}
+
 #endif
 
-static void step_machine(enum_moving_action motion, st_step_position * position)
+static uint8_t send_step_pulses(st_step_position * position, enum_moving_action mov_act)
 {
-	if(moving_forward == motion)
+	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+
+	if(steps_to_go > 0)
 	{
-		if((position->step) < 8)
+		if(moving_forward == mov_act)
 		{
-			GPIOA->ODR = Steps[position->step];
+			position->absolute_pos++;
+		}
+		else if(moving_backward == mov_act)
+		{
+			position->absolute_pos--;
 		}
 		else
 		{
-			position->step = 0;
-			GPIOA->ODR = Steps[0];
-		}
-		position->step++;
-		position->absolute_pos++;
-	}
-	else if(moving_backward == motion)
-	{
 
-		if(position->step > 0)
-		{
-			position->step--;
-			GPIOA->ODR = Steps[position->step];
 		}
-		else
-		{
-			position->step = 7;
-			GPIOA->ODR = Steps[7];
-		}
-		position->absolute_pos--;
+		steps_to_go--;
+		return 0;
 	}
-	else
-	{
-		GPIOA->ODR = 0;
+	else{
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
+		return FINISH;
 	}
-
 }
+
+static void one_second_pwm(void)
+{
+	static uint16_t var = 999;
+
+	set_pwm(var << 6);
+	if(var > 0)
+	{
+		var--;
+	}
+	else{
+		var = 999;
+		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+	}
+}
+
 
 /* USER CODE END 4 */
 
