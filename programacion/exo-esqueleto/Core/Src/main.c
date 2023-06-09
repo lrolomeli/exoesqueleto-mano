@@ -35,10 +35,26 @@ typedef enum{
 }enum_buffer_status;
 
 typedef enum{
-	stopped,
+	emergency_rst,
+	conn_success,
 	moving_forward,
-	moving_backward
-}enum_moving_action;
+	tx_succeed,
+	moving_backward,
+	halt_state,
+	reference_routine,
+	disconn_success
+}enum_action;
+
+typedef enum{
+	active,
+	passive
+}enum_action_cat;
+
+typedef enum{
+	lost,
+	home,
+	referenced
+}enum_motor_stat;
 
 typedef struct{
 	int32_t absolute_pos;
@@ -57,11 +73,12 @@ typedef enum{
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define TESTING_MOTOR
-#define milliseconds 2
 #define YES 1
 #define NO 0
 #define FINISH 1
+#define dfl_steps 2000
+#define HOME_STEPS 1
+#define COMPLETE 1
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -73,20 +90,24 @@ typedef enum{
 
 /* USER CODE BEGIN PV */
 static uint8_t buffer = 0;
-static volatile uint8_t flag = 0;
+static volatile uint8_t one_msec_flag = 0;
+static volatile enum_motor_stat home_routine = lost;
 static uint32_t steps_to_go = 0;
 static volatile enum_buffer_status buffer_status = empty;
 const enum_stepping stepping = full_step;
-const uint8_t ack[] = "\rReset\n";
+const uint8_t ack[] = "\rReference Routine Complete\n";
+static uint8_t op_has_started = NO;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-static enum_moving_action compare_byte(void);
+static enum_action read_action(void);
 static void set_pwm(uint16_t pwm);
-static uint8_t send_step_pulses(st_step_position * position, enum_moving_action mov_act);
+static uint8_t send_step_pulses(st_step_position * position, enum_action mov_act);
 static void one_second_pwm(void);
+void start_action(enum_action act);
+void clean_buffer(void);
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -126,12 +147,9 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-#ifndef TESTING_MOTOR
-	static uint8_t op_has_started = NO;
-#endif
-	static enum_moving_action moving_action = stopped;
+	static enum_action action = halt_state;
 	static st_step_position position = {0};
-	uint16_t steps = 2000;
+	//uint16_t steps = 0;
 
 	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 	HAL_TIM_Base_Start_IT(&htim3);
@@ -148,33 +166,45 @@ int main(void)
 	{
 		if(full == buffer_status)
 		{
-			moving_action = compare_byte();
-			if(moving_action != stopped){
-				steps_to_go = steps << stepping;
-#ifndef TESTING_MOTOR
-				op_has_started = YES;
-#endif
-				buffer = 0;
+			action = read_action();
+			if(action == emergency_rst)
+			{
+				op_has_started = NO;
 			}
+			else if(action % 2 == active)
+			{
+				start_action(action);
+				home_routine = 0;
+			}
+			else if(action % 2 == passive)
+			{
+			}
+			else
+			{
+			}
+			clean_buffer();
+			HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
+
 		}
 
-		if(flag)
+		if(home_routine == home)
 		{
-#ifndef TESTING_MOTOR
+			op_has_started = NO;
+			position.absolute_pos = 0;
+			home_routine = referenced;
+		}
+
+		if(one_msec_flag)
+		{
 			if(op_has_started)
 			{
-				if(send_step_pulses(&position, moving_action) == FINISH)
+				if(send_step_pulses(&position, action) == FINISH)
 				{
 					op_has_started = NO;
 				}
 			}
-#else
-			send_step_pulses(&position, moving_forward);
-			steps_to_go=1;
-#endif
-
 			one_second_pwm();
-			flag = 0;
+			one_msec_flag = 0;
 		}
 
 
@@ -223,12 +253,11 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-#ifdef UART_ENABLE
-
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
 	switch(GPIO_Pin)
 	{
 	case GPIO_PIN_5:
+		home_routine = home;
 		HAL_UART_Transmit(&huart3, (const uint8_t *) ack, sizeof(ack), 100);
 		break;
 	case GPIO_PIN_6:
@@ -255,35 +284,38 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 {
 	if(htim->Instance == TIM3)
 	{
-		if(~flag)
+		if(~one_msec_flag)
 		{
-			flag = 1;
+			one_msec_flag = 1;
 		}
 	}
 }
 
-static enum_moving_action compare_byte(void)
+static enum_action read_action(void)
 {
-	uint8_t temp_buff;
-	if(buffer == 'f' || buffer == 'b')
-	{
-		temp_buff = buffer;
-		//HAL_UART_Transmit(&huart3, (const uint8_t *) &buffer, sizeof(buffer), 100);
-	}
-	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
+	uint8_t rx_data = 0;
+
+	rx_data = buffer;
+
 	//compare byte
-	switch(temp_buff){
+	switch(rx_data){
+	case '\e':
+		return emergency_rst;
 	case 'f':
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_SET);
 		return moving_forward;
-		break;
 	case 'b':
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
 		return moving_backward;
-		break;
+	case 'h':
+		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_14, GPIO_PIN_RESET);
+		return reference_routine;
+	case 0:
+		return tx_succeed;
+	case '+':
+			return halt_state;
 	default:
-		return stopped;
-		break;
+		return halt_state;
 	}
 }
 
@@ -294,28 +326,31 @@ static void set_pwm(uint16_t pwm){
 	__HAL_TIM_SET_COMPARE(&htim2, TIM_CHANNEL_4, pwm);
 }
 
-#endif
-
-static uint8_t send_step_pulses(st_step_position * position, enum_moving_action mov_act)
+static uint8_t send_step_pulses(st_step_position * position, enum_action act)
 {
-	HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 
 	if(steps_to_go > 0)
 	{
-		if(moving_forward == mov_act)
+		switch(act)
 		{
-			position->absolute_pos++;
-		}
-		else if(moving_backward == mov_act)
-		{
+		case reference_routine:
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+			return 0;
+		case moving_backward:
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
 			position->absolute_pos--;
+			steps_to_go--;
+			return 0;
+		case moving_forward:
+			HAL_GPIO_TogglePin(GPIOA, GPIO_PIN_4);
+			position->absolute_pos++;
+			steps_to_go--;
+			return 0;
+		default:
+			steps_to_go = 0;
+			return FINISH;
 		}
-		else
-		{
 
-		}
-		steps_to_go--;
-		return 0;
 	}
 	else{
 		HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
@@ -337,6 +372,38 @@ static void one_second_pwm(void)
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
 }
+
+void start_action(enum_action act){
+
+	switch(act)
+	{
+	case reference_routine:
+		home_routine = lost;
+		steps_to_go = HOME_STEPS;
+		op_has_started = YES;
+		break;
+	case moving_backward:
+		steps_to_go = dfl_steps << stepping;
+		op_has_started = YES;
+		break;
+	case moving_forward:
+		steps_to_go = dfl_steps << stepping;
+		op_has_started = YES;
+		break;
+	default:
+		steps_to_go = 0;
+		op_has_started = NO;
+		break;
+	}
+
+}
+
+void clean_buffer()
+{
+	buffer = 0;
+	buffer_status = empty;
+}
+
 
 
 /* USER CODE END 4 */
