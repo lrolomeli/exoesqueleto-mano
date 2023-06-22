@@ -1,0 +1,36 @@
+!SESSION 2023-06-21 21:33:16.448 -----------------------------------------------
+eclipse.buildId=Version 1.12.1
+java.version=11.0.17
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2023-06-21 21:33:23.742
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2023-06-21 21:33:23.758
+!MESSAGE Log4j2 initialized with config file C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2023-06-21 21:33:27.789
+!MESSAGE Started RMI Server, listening on port 41337
+!SESSION 2023-06-21 21:37:08.988 -----------------------------------------------
+eclipse.buildId=Version 1.12.1
+java.version=11.0.17
+java.vendor=Eclipse Adoptium
+BootLoader constants: OS=win32, ARCH=x86_64, WS=win32, NL=es_MX
+Command-line arguments:  -os win32 -ws win32 -arch x86_64 -data C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 4 4 2023-06-21 21:37:14.754
+!MESSAGE CubeMX plugin appears to be active, Log4j initialization might be too late.
+
+!ENTRY com.st.stm32cube.ide.mcu.informationcenter 1 1 2023-06-21 21:37:14.754
+!MESSAGE Log4j2 initialized with config file C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\.metadata\.log4j2.xml
+
+!ENTRY com.st.stm32cube.ide.mcu.ide 1 1 2023-06-21 21:37:18.670
+!MESSAGE Started RMI Server, listening on port 41337
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-06-21 21:38:35.343
+!MESSAGE Indexed 'blink-led' (23 sources, 111 headers) in 4.67 sec: 9,625 declarations; 48,896 references; 6 unresolved inclusions; 944 syntax errors; 1,175 unresolved names (2 %)
+
+!ENTRY org.eclipse.cdt.core 1 0 2023-06-21 21:39:13.175
+!MESSAGE Indexed 'exo-esqueleto' (0 sources, 0 headers) in 0 sec: 0 declarations; 0 references; 0 unresolved inclusions; 0 syntax errors; 0 unresolved names (0 %)

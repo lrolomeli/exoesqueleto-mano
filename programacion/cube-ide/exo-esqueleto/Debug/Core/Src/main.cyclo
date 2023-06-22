@@ -1,0 +1,16 @@
+main.c:127:5:main	9
+main.c:231:6:SystemClock_Config	3
+main.c:265:6:HAL_GPIO_EXTI_Callback	10
+main.c:288:6:HAL_UART_RxCpltCallback	2
+main.c:295:6:HAL_TIM_PeriodElapsedCallback	2
+main.c:306:20:read_action	11
+main.c:330:13:set_pwm	1
+main.c:337:16:send_step_pulses	8
+main.c:382:13:one_second_pwm	2
+main.c:397:6:start_action	5
+main.c:425:6:clean_buffer	1
+main.c:431:6:sleep_motor	1
+main.c:436:6:motor_wakeup	1
+main.c:442:6:send_pulse	1
+main.c:447:9:is_motor_home	1
+main.c:457:6:Error_Handler	1
