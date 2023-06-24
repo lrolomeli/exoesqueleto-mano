@@ -366,20 +366,21 @@ static uint8_t send_step_pulses(st_step_position * position, enum_action act)
 
 	}
 	else{
+		//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
 		return FINISH;
 	}
 }
 
 static void alive_fn(void)
 {
-	static uint16_t var = 16000;
+	static uint32_t var = 0xFFFFFFFF;
 
 	if(var > 0)
 	{
 		var--;
 	}
 	else{
-		var = 16000;
+		var = 0xFFFFFFFF;
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
 }

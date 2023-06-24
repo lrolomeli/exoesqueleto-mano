@@ -366,6 +366,7 @@ static uint8_t send_step_pulses(st_step_position * position, enum_action act)
 
 	}
 	else{
+		//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
 		return FINISH;
 	}
 }

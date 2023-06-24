@@ -90,7 +90,7 @@ typedef enum{
 
 /* USER CODE BEGIN PV */
 static uint8_t buffer = 0;
-static volatile uint8_t timeout_flg = 0;
+static volatile uint8_t one_msec_flag = 0;
 static volatile enum_motor_stat home_routine = lost;
 static uint32_t steps_to_go = 0;
 static volatile enum_buffer_status buffer_status = empty;
@@ -104,7 +104,7 @@ void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 static enum_action read_action(void);
 static uint8_t send_step_pulses(st_step_position * position, enum_action mov_act);
-static void alive_fn(void);
+static void one_second_pwm(void);
 void start_action(enum_action act);
 void clean_buffer(void);
 void sleep_motor(void);
@@ -202,7 +202,7 @@ int main(void)
 			home_routine = referenced;
 		}
 
-		if(timeout_flg)
+		if(one_msec_flag)
 		{
 			if(op_has_started)
 			{
@@ -212,8 +212,8 @@ int main(void)
 					op_has_started = NO;
 				}
 			}
-			alive_fn();
-			timeout_flg = 0;
+			one_second_pwm();
+			one_msec_flag = 0;
 		}
 
     /* USER CODE END WHILE */
@@ -295,9 +295,9 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 {
 	if(htim->Instance == TIM3)
 	{
-		if(~timeout_flg)
+		if(~one_msec_flag)
 		{
-			timeout_flg = 1;
+			one_msec_flag = 1;
 		}
 	}
 }
@@ -366,20 +366,21 @@ static uint8_t send_step_pulses(st_step_position * position, enum_action act)
 
 	}
 	else{
+		//HAL_GPIO_WritePin(GPIOC, GPIO_PIN_13, 1);
 		return FINISH;
 	}
 }
 
-static void alive_fn(void)
+static void one_second_pwm(void)
 {
-	static uint16_t var = 16000;
+	static uint32_t var = 0xFFFFFFFF;
 
 	if(var > 0)
 	{
 		var--;
 	}
 	else{
-		var = 16000;
+		var = 0xFFFFFFFF;
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
 }
