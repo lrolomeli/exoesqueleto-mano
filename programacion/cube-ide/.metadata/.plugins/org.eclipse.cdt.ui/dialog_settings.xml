@@ -3,4 +3,12 @@
 	<section name="CResourceRenameRefactoringInputPage">
 		<item key="updateReferences" value="true"/>
 	</section>
+	<section name="completion_proposal_size">
+	</section>
+	<section name="org.eclipse.cdt.ui.text.hover.CMacroExpansionExploration">
+	</section>
+	<section name="RenameInformationPopup">
+	</section>
+	<section name="CRenameRefactoringInputPage">
+	</section>
 </section>

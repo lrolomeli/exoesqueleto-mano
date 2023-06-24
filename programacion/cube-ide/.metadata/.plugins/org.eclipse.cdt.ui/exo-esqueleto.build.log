@@ -1,17 +1,10 @@
-10:20:08 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+10:28:49 **** Incremental Build of configuration Debug for project exo-esqueleto ****
 make -j8 all 
-arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
-arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
-Finished building target: exo-esqueleto.elf
- 
 arm-none-eabi-size   exo-esqueleto.elf 
-arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
    text	   data	    bss	    dec	    hex	filename
-  14608	     24	   1808	  16440	   4038	exo-esqueleto.elf
+  13016	     24	   1808	  14848	   3a00	exo-esqueleto.elf
 Finished building: default.size.stdout
  
-Finished building: exo-esqueleto.list
- 
 
-10:20:09 Build Finished. 0 errors, 0 warnings. (took 878ms)
+10:28:49 Build Finished. 0 errors, 0 warnings. (took 299ms)
 
