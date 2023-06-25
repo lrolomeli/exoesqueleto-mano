@@ -1,4 +1,0 @@
-2023-06-24 10:26:24,578 [INFO] LogOutputStream:77 - [STDOUT_REDIRECT] 
-2023-06-24 10:26:26,527 [INFO] ProjectBuilder:4505 - Time for Generating toolchain IDE Files: 3594mS.
-2023-06-24 10:26:26,528 [INFO] ProjectBuilder:2867 - Time for Copy CMSIS : 1mS.
-2023-06-24 10:26:26,531 [INFO] ProjectBuilder:2867 - Time for Copy CMSIS : 0mS.
