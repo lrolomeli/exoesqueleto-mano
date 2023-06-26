@@ -1,4 +1,2338 @@
-10:27:51 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+21:12:23 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'enum_action' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:381:35: error: 'st_fconfig' has no member named 'fhome_pin'
+  381 |    if(is_finger_up(fconfig[finger].fhome_pin)){
+      |                                   ^
+../Core/Src/main.c:386:31: error: 'st_fconfig' has no member named 'fport'
+  386 |     send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                               ^
+../Core/Src/main.c:386:54: error: 'st_fconfig' has no member named 'fstp_pin'
+  386 |     send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                                                      ^
+../Core/Src/main.c:390:35: error: 'st_fconfig' has no member named 'fhome_pin'
+  390 |    if(is_finger_up(fconfig[finger].fhome_pin)){
+      |                                   ^
+../Core/Src/main.c:395:31: error: 'st_fconfig' has no member named 'fport'
+  395 |     send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                               ^
+../Core/Src/main.c:395:54: error: 'st_fconfig' has no member named 'fstp_pin'
+  395 |     send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                                                      ^
+../Core/Src/main.c:402:30: error: 'st_fconfig' has no member named 'fport'
+  402 |    send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                              ^
+../Core/Src/main.c:402:53: error: 'st_fconfig' has no member named 'fstp_pin'
+  402 |    send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                                                     ^
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:13:55 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'enum_action' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:373:16: error: conflicting types for 'send_step_pulses'
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act, uint8_t finger)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:149:16: note: previous declaration of 'send_step_pulses' was here
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:390:35: error: 'st_fconfig' has no member named 'fhome_pin'
+  390 |    if(is_finger_up(fconfig[finger].fhome_pin)){
+      |                                   ^
+../Core/Src/main.c:395:31: error: 'st_fconfig' has no member named 'fport'
+  395 |     send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                               ^
+../Core/Src/main.c:395:54: error: 'st_fconfig' has no member named 'fstp_pin'
+  395 |     send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                                                      ^
+../Core/Src/main.c:402:30: error: 'st_fconfig' has no member named 'fport'
+  402 |    send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                              ^
+../Core/Src/main.c:402:53: error: 'st_fconfig' has no member named 'fstp_pin'
+  402 |    send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                                                     ^
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:149:16: warning: 'send_step_pulses' used but never defined
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:373:16: warning: 'send_step_pulses' defined but not used [-Wunused-function]
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act, uint8_t finger)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:14:44 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'enum_action' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:373:16: error: conflicting types for 'send_step_pulses'
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act, uint8_t finger)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:149:16: note: previous declaration of 'send_step_pulses' was here
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:402:30: error: 'st_fconfig' has no member named 'fport'
+  402 |    send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                              ^
+../Core/Src/main.c:402:53: error: 'st_fconfig' has no member named 'fstp_pin'
+  402 |    send_pulse(fconfig[finger].fport, fconfig[finger].fstp_pin);
+      |                                                     ^
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:149:16: warning: 'send_step_pulses' used but never defined
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:373:16: warning: 'send_step_pulses' defined but not used [-Wunused-function]
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act, uint8_t finger)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:15:00 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'enum_action' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:373:16: error: conflicting types for 'send_step_pulses'
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act, uint8_t finger)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:149:16: note: previous declaration of 'send_step_pulses' was here
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:149:16: warning: 'send_step_pulses' used but never defined
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:373:16: warning: 'send_step_pulses' defined but not used [-Wunused-function]
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act, uint8_t finger)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:16:23 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'enum_action' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:373:16: error: conflicting types for 'send_step_pulses'
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:149:16: note: previous declaration of 'send_step_pulses' was here
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:149:16: warning: 'send_step_pulses' used but never defined
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, enum_action act, uint8_t finger);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:373:16: warning: 'send_step_pulses' defined but not used [-Wunused-function]
+  373 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act)
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:16:37 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'st_action *' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c:246:8: error: too many arguments to function 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |        ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:149:16: note: declared here
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:16:43 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:246:36: error: incompatible type for argument 2 of 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |                                    ^~~~~~
+      |                                    |
+      |                                    st_action
+../Core/Src/main.c:149:71: note: expected 'st_action *' but argument is of type 'st_action'
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                                                           ~~~~~~~~~~~~^~~
+../Core/Src/main.c:246:8: error: too many arguments to function 'send_step_pulses'
+  246 |     if(send_step_pulses(fposition, action, index) == FINISH)
+      |        ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:149:16: note: declared here
+  149 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:16:58 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:18:31 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (const uint16_t)(fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:20:31 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:304:2: error: case label does not reduce to an integer constant
+  304 |  case (const uint16_t)(fconfig[index].home.pin):
+      |  ^~~~
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:20:40 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:21:55 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:22:24 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:22:29 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:154:6: note: declared here
+  154 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:501:6: warning: conflicting types for 'set_direction'
+  501 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:436:3: note: previous implicit declaration of 'set_direction' was here
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:141:20: warning: 'action' defined but not used [-Wunused-variable]
+  141 | static enum_action action = halt_state;
+      |                    ^~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:25:18 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:310:2: error: case label does not reduce to an integer constant
+  310 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:312:2: error: case label does not reduce to an integer constant
+  312 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:316:2: error: case label does not reduce to an integer constant
+  316 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:362:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  362 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:432:14: error: expected identifier before ')' token
+  432 |  switch(act->)
+      |              ^
+../Core/Src/main.c:435:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  435 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:438:3: error: 'steps_to_go' undeclared (first use in this function)
+  438 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:438:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:439:3: error: 'op_has_started' undeclared (first use in this function)
+  439 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:443:3: error: too few arguments to function 'motor_wakeup'
+  443 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:449:3: error: too few arguments to function 'motor_wakeup'
+  449 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:500:6: warning: conflicting types for 'set_direction'
+  500 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:435:3: note: previous implicit declaration of 'set_direction' was here
+  435 |   set_direction();
+      |   ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:26:47 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:310:2: error: case label does not reduce to an integer constant
+  310 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:312:2: error: case label does not reduce to an integer constant
+  312 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:316:2: error: case label does not reduce to an integer constant
+  316 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:362:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  362 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:432:14: error: expected identifier before ')' token
+  432 |  switch(act->)
+      |              ^
+../Core/Src/main.c:435:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  435 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:438:3: error: 'steps_to_go' undeclared (first use in this function)
+  438 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:438:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:439:3: error: 'op_has_started' undeclared (first use in this function)
+  439 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:443:3: error: too few arguments to function 'motor_wakeup'
+  443 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:449:3: error: too few arguments to function 'motor_wakeup'
+  449 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:500:6: warning: conflicting types for 'set_direction'
+  500 | void set_direction(enum_ports port, uint16_t pin, uint8_t dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:435:3: note: previous implicit declaration of 'set_direction' was here
+  435 |   set_direction();
+      |   ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:27:44 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:310:2: error: case label does not reduce to an integer constant
+  310 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:312:2: error: case label does not reduce to an integer constant
+  312 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:316:2: error: case label does not reduce to an integer constant
+  316 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:362:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  362 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:341:13: note: declared here
+  341 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:432:14: error: expected identifier before ')' token
+  432 |  switch(act->)
+      |              ^
+../Core/Src/main.c:435:3: warning: implicit declaration of function 'set_direction' [-Wimplicit-function-declaration]
+  435 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:438:3: error: 'steps_to_go' undeclared (first use in this function)
+  438 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:438:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:439:3: error: 'op_has_started' undeclared (first use in this function)
+  439 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:443:3: error: too few arguments to function 'motor_wakeup'
+  443 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:449:3: error: too few arguments to function 'motor_wakeup'
+  449 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:500:6: warning: conflicting types for 'set_direction'
+  500 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir)
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:435:3: note: previous implicit declaration of 'set_direction' was here
+  435 |   set_direction();
+      |   ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:28:07 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:311:2: error: case label does not reduce to an integer constant
+  311 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:363:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  363 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:366:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  366 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:369:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  369 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:342:13: note: declared here
+  342 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:433:14: error: expected identifier before ')' token
+  433 |  switch(act->)
+      |              ^
+../Core/Src/main.c:436:3: error: too few arguments to function 'set_direction'
+  436 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:156:6: note: declared here
+  156 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:439:3: error: 'steps_to_go' undeclared (first use in this function)
+  439 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:439:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:440:3: error: 'op_has_started' undeclared (first use in this function)
+  440 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:443:3: error: too few arguments to function 'set_direction'
+  443 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:156:6: note: declared here
+  156 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:444:3: error: too few arguments to function 'motor_wakeup'
+  444 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:449:3: error: too few arguments to function 'set_direction'
+  449 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:156:6: note: declared here
+  156 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:450:3: error: too few arguments to function 'motor_wakeup'
+  450 |   motor_wakeup();
+      |   ^~~~~~~~~~~~
+../Core/Src/main.c:153:6: note: declared here
+  153 | void motor_wakeup(enum_ports port, uint16_t pin);
+      |      ^~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:30:57 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:435:14: error: expected identifier before ')' token
+  435 |  switch(act->)
+      |              ^
+../Core/Src/main.c:438:31: error: 'st_fconfig' has no member named 'dir'
+  438 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, DOWN);
+      |                               ^
+../Core/Src/main.c:438:56: error: 'st_fconfig' has no member named 'dir'
+  438 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, DOWN);
+      |                                                        ^
+../Core/Src/main.c:441:3: error: 'steps_to_go' undeclared (first use in this function)
+  441 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:441:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:442:3: error: 'op_has_started' undeclared (first use in this function)
+  442 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:445:31: error: 'st_fconfig' has no member named 'dir'
+  445 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, UP);
+      |                               ^
+../Core/Src/main.c:445:56: error: 'st_fconfig' has no member named 'dir'
+  445 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, UP);
+      |                                                        ^
+../Core/Src/main.c:451:3: error: too few arguments to function 'set_direction'
+  451 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:158:6: note: declared here
+  158 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+      |      ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:31:20 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:438:31: error: 'st_fconfig' has no member named 'dir'
+  438 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, DOWN);
+      |                               ^
+../Core/Src/main.c:438:56: error: 'st_fconfig' has no member named 'dir'
+  438 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, DOWN);
+      |                                                        ^
+../Core/Src/main.c:441:3: error: 'steps_to_go' undeclared (first use in this function)
+  441 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:441:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:442:3: error: 'op_has_started' undeclared (first use in this function)
+  442 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:445:31: error: 'st_fconfig' has no member named 'dir'
+  445 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, UP);
+      |                               ^
+../Core/Src/main.c:445:56: error: 'st_fconfig' has no member named 'dir'
+  445 |   set_direction(fconfig[index].dir.port, fconfig[index].dir.pin, UP);
+      |                                                        ^
+../Core/Src/main.c:451:3: error: too few arguments to function 'set_direction'
+  451 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:158:6: note: declared here
+  158 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+      |      ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:31:40 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:441:3: error: 'steps_to_go' undeclared (first use in this function)
+  441 |   steps_to_go = HOME_STEPS;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:441:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:442:3: error: 'op_has_started' undeclared (first use in this function)
+  442 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+../Core/Src/main.c:451:3: error: too few arguments to function 'set_direction'
+  451 |   set_direction();
+      |   ^~~~~~~~~~~~~
+../Core/Src/main.c:158:6: note: declared here
+  158 | void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+      |      ^~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:33:37 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:433:6: error: conflicting types for 'start_action'
+  433 | void start_action(st_fposition * fposition, st_action * act){
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:152:6: note: previous declaration of 'start_action' was here
+  152 | void start_action(st_action * act);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:453:3: error: 'steps_to_go' undeclared (first use in this function)
+  453 |   steps_to_go = dfl_steps << stepping;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:453:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:454:3: error: 'op_has_started' undeclared (first use in this function)
+  454 |   op_has_started = YES;
+      |   ^~~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:33:49 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:433:6: error: conflicting types for 'start_action'
+  433 | void start_action(st_fposition * fposition, st_action * act){
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:152:6: note: previous declaration of 'start_action' was here
+  152 | void start_action(st_action * act);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:457:3: error: 'steps_to_go' undeclared (first use in this function)
+  457 |   steps_to_go = 0;
+      |   ^~~~~~~~~~~
+../Core/Src/main.c:457:3: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:458:3: error: 'op_has_started' undeclared (first use in this function)
+  458 |   op_has_started = NO;
+      |   ^~~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:33:58 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:433:6: error: conflicting types for 'start_action'
+  433 | void start_action(st_fposition * fposition, st_action * act){
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:152:6: note: previous declaration of 'start_action' was here
+  152 | void start_action(st_action * act);
+      |      ^~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:34:19 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:172:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  172 | {
+      | ^
+../Core/Src/main.c:270:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  270 | {
+      | ^
+../Core/Src/main.c:303:47: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  303 | void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+      |                                               ^
+../Core/Src/main.c:326:56: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  326 | void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+      |                                                        ^
+../Core/Src/main.c:334:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  334 | {
+      | ^
+../Core/Src/main.c:345:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  345 | {
+      | ^
+../Core/Src/main.c:376:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  376 | {
+      | ^
+../Core/Src/main.c:420:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  420 | {
+      | ^
+../Core/Src/main.c:434:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  434 | {
+      | ^
+../Core/Src/main.c:465:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  465 | {
+      | ^
+../Core/Src/main.c:471:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  471 | {
+      | ^
+../Core/Src/main.c:479:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  479 | {
+      | ^
+../Core/Src/main.c:488:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  488 | {
+      | ^
+../Core/Src/main.c:499:50: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  499 | uint8_t is_finger_up(uint16_t finger_home_sensor){
+      |                                                  ^
+../Core/Src/main.c:504:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  504 | {
+      | ^
+../Core/Src/main.c:518:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  518 | {
+      | ^
+../Core/Src/main.c:152:6: error: old-style parameter declarations in prototyped function definition
+  152 | void start_action(st_fposition * fposition, st_action * act)
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:544: error: expected '{' at end of input
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:149:13: warning: 'read_action' declared 'static' but never defined [-Wunused-function]
+  149 | static void read_action(st_action * action);
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:150:16: warning: 'send_step_pulses' declared 'static' but never defined [-Wunused-function]
+  150 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:151:13: warning: 'alive_fn' declared 'static' but never defined [-Wunused-function]
+  151 | static void alive_fn(void);
+      |             ^~~~~~~~
+../Core/Src/main.c:142:22: warning: 'ack' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ack[] = "\rReference Routine Complete\n";
+      |                      ^~~
+../Core/Src/main.c:141:28: warning: 'stepping' defined but not used [-Wunused-const-variable=]
+  141 | static const enum_stepping stepping = sixteen_step;
+      |                            ^~~~~~~~
+../Core/Src/main.c:137:16: warning: 'buffer' defined but not used [-Wunused-variable]
+  137 | static uint8_t buffer = 0;
+      |                ^~~~~~
+../Core/Src/main.c:128:25: warning: 'fconfig' defined but not used [-Wunused-const-variable=]
+  128 | static const st_fconfig fconfig[flength] = {
+      |                         ^~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:36:37 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:172:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  172 | {
+      | ^
+../Core/Src/main.c:270:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  270 | {
+      | ^
+../Core/Src/main.c:303:47: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  303 | void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+      |                                               ^
+../Core/Src/main.c:326:56: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  326 | void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+      |                                                        ^
+../Core/Src/main.c:334:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  334 | {
+      | ^
+../Core/Src/main.c:345:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  345 | {
+      | ^
+../Core/Src/main.c:376:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  376 | {
+      | ^
+../Core/Src/main.c:420:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  420 | {
+      | ^
+../Core/Src/main.c:434:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  434 | {
+      | ^
+../Core/Src/main.c:465:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  465 | {
+      | ^
+../Core/Src/main.c:471:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  471 | {
+      | ^
+../Core/Src/main.c:479:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  479 | {
+      | ^
+../Core/Src/main.c:488:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  488 | {
+      | ^
+../Core/Src/main.c:499:50: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  499 | uint8_t is_finger_up(uint16_t finger_home_sensor){
+      |                                                  ^
+../Core/Src/main.c:504:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  504 | {
+      | ^
+../Core/Src/main.c:518:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  518 | {
+      | ^
+../Core/Src/main.c:152:6: error: old-style parameter declarations in prototyped function definition
+  152 | void start_action(st_fposition * fposition, st_action * act)
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:544: error: expected '{' at end of input
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:149:13: warning: 'read_action' declared 'static' but never defined [-Wunused-function]
+  149 | static void read_action(st_action * action);
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:150:16: warning: 'send_step_pulses' declared 'static' but never defined [-Wunused-function]
+  150 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:151:13: warning: 'alive_fn' declared 'static' but never defined [-Wunused-function]
+  151 | static void alive_fn(void);
+      |             ^~~~~~~~
+../Core/Src/main.c:142:22: warning: 'ack' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ack[] = "\rReference Routine Complete\n";
+      |                      ^~~
+../Core/Src/main.c:141:28: warning: 'stepping' defined but not used [-Wunused-const-variable=]
+  141 | static const enum_stepping stepping = sixteen_step;
+      |                            ^~~~~~~~
+../Core/Src/main.c:137:16: warning: 'buffer' defined but not used [-Wunused-variable]
+  137 | static uint8_t buffer = 0;
+      |                ^~~~~~
+../Core/Src/main.c:128:25: warning: 'fconfig' defined but not used [-Wunused-const-variable=]
+  128 | static const st_fconfig fconfig[flength] = {
+      |                         ^~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:37:04 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:172:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  172 | {
+      | ^
+../Core/Src/main.c:270:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  270 | {
+      | ^
+../Core/Src/main.c:303:47: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  303 | void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin){
+      |                                               ^
+../Core/Src/main.c:326:56: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  326 | void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+      |                                                        ^
+../Core/Src/main.c:334:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  334 | {
+      | ^
+../Core/Src/main.c:345:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  345 | {
+      | ^
+../Core/Src/main.c:376:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  376 | {
+      | ^
+../Core/Src/main.c:420:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  420 | {
+      | ^
+../Core/Src/main.c:434:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  434 | {
+      | ^
+../Core/Src/main.c:465:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  465 | {
+      | ^
+../Core/Src/main.c:471:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  471 | {
+      | ^
+../Core/Src/main.c:479:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  479 | {
+      | ^
+../Core/Src/main.c:488:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  488 | {
+      | ^
+../Core/Src/main.c:499:50: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  499 | uint8_t is_finger_up(uint16_t finger_home_sensor){
+      |                                                  ^
+../Core/Src/main.c:504:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  504 | {
+      | ^
+../Core/Src/main.c:518:1: error: expected '=', ',', ';', 'asm' or '__attribute__' before '{' token
+  518 | {
+      | ^
+../Core/Src/main.c:152:6: error: old-style parameter declarations in prototyped function definition
+  152 | void start_action(st_fposition * fposition, st_action * act)
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:544: error: expected '{' at end of input
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:149:13: warning: 'read_action' declared 'static' but never defined [-Wunused-function]
+  149 | static void read_action(st_action * action);
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:150:16: warning: 'send_step_pulses' declared 'static' but never defined [-Wunused-function]
+  150 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                ^~~~~~~~~~~~~~~~
+../Core/Src/main.c:151:13: warning: 'alive_fn' declared 'static' but never defined [-Wunused-function]
+  151 | static void alive_fn(void);
+      |             ^~~~~~~~
+../Core/Src/main.c:142:22: warning: 'ack' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ack[] = "\rReference Routine Complete\n";
+      |                      ^~~
+../Core/Src/main.c:141:28: warning: 'stepping' defined but not used [-Wunused-const-variable=]
+  141 | static const enum_stepping stepping = sixteen_step;
+      |                            ^~~~~~~~
+../Core/Src/main.c:137:16: warning: 'buffer' defined but not used [-Wunused-variable]
+  137 | static uint8_t buffer = 0;
+      |                ^~~~~~
+../Core/Src/main.c:128:25: warning: 'fconfig' defined but not used [-Wunused-const-variable=]
+  128 | static const st_fconfig fconfig[flength] = {
+      |                         ^~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:37:19 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:220:18: warning: passing argument 1 of 'start_action' from incompatible pointer type [-Wincompatible-pointer-types]
+  220 |     start_action(&fposition, &action);
+      |                  ^~~~~~~~~~
+      |                  |
+      |                  st_fposition (*)[5]
+../Core/Src/main.c:152:34: note: expected 'st_fposition *' but argument is of type 'st_fposition (*)[5]'
+  152 | void start_action(st_fposition * fposition, st_action * act);
+      |                   ~~~~~~~~~~~~~~~^~~~~~~~~
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:37:49 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c: In function 'read_action':
+../Core/Src/main.c:365:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  365 |   return tx_succeed;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:368:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  368 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+../Core/Src/main.c:371:10: warning: 'return' with a value, in function returning void [-Wreturn-type]
+  371 |   return halt_state;
+      |          ^~~~~~~~~~
+../Core/Src/main.c:344:13: note: declared here
+  344 | static void read_action(st_action * action)
+      |             ^~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:38:22 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:313:2: error: case label does not reduce to an integer constant
+  313 |  case fconfig[thumb].home.pin:
+      |  ^~~~
+../Core/Src/main.c:315:2: error: case label does not reduce to an integer constant
+  315 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:40:21 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:316:2: error: case label does not reduce to an integer constant
+  316 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:318:2: error: case label does not reduce to an integer constant
+  318 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:320:2: error: case label does not reduce to an integer constant
+  320 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c:304:11: warning: variable 'gpiopin' set but not used [-Wunused-but-set-variable]
+  304 |  uint16_t gpiopin = fconfig[thumb].home.pin;
+      |           ^~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:40:44 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:316:2: error: case label does not reduce to an integer constant
+  316 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:318:2: error: case label does not reduce to an integer constant
+  318 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:320:2: error: case label does not reduce to an integer constant
+  320 |  case fconfig[little].home.pin:
+      |  ^~~~
+../Core/Src/main.c:304:11: warning: variable 'gpiopin' set but not used [-Wunused-but-set-variable]
+  304 |  uint16_t gpiopin = fconfig[thumb].home.pin;
+      |           ^~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:41:41 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:321:2: error: case label does not reduce to an integer constant
+  321 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:41:59 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:321:2: error: case label does not reduce to an integer constant
+  321 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:42:02 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:321:2: error: case label does not reduce to an integer constant
+  321 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:42:14 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:321:2: error: case label does not reduce to an integer constant
+  321 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:45:15 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:321:2: error: case label does not reduce to an integer constant
+  321 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:46:17 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'HAL_GPIO_EXTI_Callback':
+../Core/Src/main.c:314:2: error: case label does not reduce to an integer constant
+  314 |  case gpiopin:
+      |  ^~~~
+../Core/Src/main.c:317:2: error: case label does not reduce to an integer constant
+  317 |  case fconfig[middle].home.pin:
+      |  ^~~~
+../Core/Src/main.c:319:2: error: case label does not reduce to an integer constant
+  319 |  case fconfig[ring].home.pin:
+      |  ^~~~
+../Core/Src/main.c:321:2: error: case label does not reduce to an integer constant
+  321 |  case fconfig[little].home.pin:
+      |  ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:46:57 **** Incremental Build of configuration Debug for project exo-esqueleto ****
 make -j8 all 
 arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
 arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
@@ -7,15 +2341,264 @@ Finished building target: exo-esqueleto.elf
 arm-none-eabi-size   exo-esqueleto.elf 
 arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
    text	   data	    bss	    dec	    hex	filename
-  13016	     24	   1808	  14848	   3a00	exo-esqueleto.elf
+  13212	     24	   1848	  15084	   3aec	exo-esqueleto.elf
 Finished building: default.size.stdout
  
 Finished building: exo-esqueleto.list
  
-10:28:49 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+21:49:11 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:383:40: error: 'st_fconfig' has no member named 'home'
+  383 |    if(is_finger_up(fconfig[act->finger].home.pin)){
+      |                                        ^
+../Core/Src/main.c:392:40: error: 'st_fconfig' has no member named 'home'
+  392 |    if(is_finger_up(fconfig[act->finger].home.pin)){
+      |                                        ^
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+21:49:59 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: exo-esqueleto.elf
+ 
+arm-none-eabi-size   exo-esqueleto.elf 
+arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
+   text	   data	    bss	    dec	    hex	filename
+  13208	     24	   1848	  15080	   3ae8	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+Finished building: exo-esqueleto.list
+ 
+21:55:19 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: exo-esqueleto.elf
+ 
+arm-none-eabi-size   exo-esqueleto.elf 
+arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
+   text	   data	    bss	    dec	    hex	filename
+  13148	     24	   1848	  15020	   3aac	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+Finished building: exo-esqueleto.list
+ 
+22:13:38 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:220:18: error: assignment to expression with array type
+  220 |     home_routine = lost;
+      |                  ^
+../Core/Src/main.c:224:51: error: incompatible type for argument 2 of 'start_action'
+  224 |     start_action(&fposition[action.finger], action.action);
+      |                                             ~~~~~~^~~~~~~
+      |                                                   |
+      |                                                   enum_action
+../Core/Src/main.c:156:57: note: expected 'st_action *' but argument is of type 'enum_action'
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |                                             ~~~~~~~~~~~~^~~
+../Core/Src/main.c:233:18: error: assignment to expression with array type
+  233 |     home_routine = lost;
+      |                  ^
+../Core/Src/main.c:245:17: error: assignment to expression with array type
+  245 |    home_routine = referenced;
+      |                 ^
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:463:6: error: conflicting types for 'start_action'
+  463 | void start_action(st_fposition * fposition, enum_action act)
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:156:6: note: previous declaration of 'start_action' was here
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:469:16: error: assignment to expression with array type
+  469 |   home_routine = lost;
+      |                ^
+At top level:
+../Core/Src/main.c:146:22: warning: 'ackl' defined but not used [-Wunused-const-variable=]
+  146 | static const uint8_t ackl[] = "\rLittle Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:145:22: warning: 'ackr' defined but not used [-Wunused-const-variable=]
+  145 | static const uint8_t ackr[] = "\rRing Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:144:22: warning: 'ackm' defined but not used [-Wunused-const-variable=]
+  144 | static const uint8_t ackm[] = "\rMiddleReference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:142:22: warning: 'ackt' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ackt[] = "\rThumb Reference Routine Complete\n";
+      |                      ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+22:14:27 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:224:51: error: incompatible type for argument 2 of 'start_action'
+  224 |     start_action(&fposition[action.finger], action.action);
+      |                                             ~~~~~~^~~~~~~
+      |                                                   |
+      |                                                   enum_action
+../Core/Src/main.c:156:57: note: expected 'st_action *' but argument is of type 'enum_action'
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |                                             ~~~~~~~~~~~~^~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:463:6: error: conflicting types for 'start_action'
+  463 | void start_action(st_fposition * fposition, enum_action act)
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c:156:6: note: previous declaration of 'start_action' was here
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |      ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'start_action':
+../Core/Src/main.c:469:16: error: assignment to expression with array type
+  469 |   home_routine = lost;
+      |                ^
+At top level:
+../Core/Src/main.c:146:22: warning: 'ackl' defined but not used [-Wunused-const-variable=]
+  146 | static const uint8_t ackl[] = "\rLittle Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:145:22: warning: 'ackr' defined but not used [-Wunused-const-variable=]
+  145 | static const uint8_t ackr[] = "\rRing Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:144:22: warning: 'ackm' defined but not used [-Wunused-const-variable=]
+  144 | static const uint8_t ackm[] = "\rMiddleReference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:142:22: warning: 'ackt' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ackt[] = "\rThumb Reference Routine Complete\n";
+      |                      ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+22:16:41 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:224:51: error: incompatible type for argument 2 of 'start_action'
+  224 |     start_action(&fposition[action.finger], action.action);
+      |                                             ~~~~~~^~~~~~~
+      |                                                   |
+      |                                                   enum_action
+../Core/Src/main.c:156:57: note: expected 'st_action *' but argument is of type 'enum_action'
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |                                             ~~~~~~~~~~~~^~~
+At top level:
+../Core/Src/main.c:146:22: warning: 'ackl' defined but not used [-Wunused-const-variable=]
+  146 | static const uint8_t ackl[] = "\rLittle Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:145:22: warning: 'ackr' defined but not used [-Wunused-const-variable=]
+  145 | static const uint8_t ackr[] = "\rRing Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:144:22: warning: 'ackm' defined but not used [-Wunused-const-variable=]
+  144 | static const uint8_t ackm[] = "\rMiddleReference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:142:22: warning: 'ackt' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ackt[] = "\rThumb Reference Routine Complete\n";
+      |                      ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+22:17:03 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:224:51: error: incompatible type for argument 2 of 'start_action'
+  224 |     start_action(&fposition[action.finger], action.action);
+      |                                             ~~~~~~^~~~~~~
+      |                                                   |
+      |                                                   enum_action
+../Core/Src/main.c:156:57: note: expected 'st_action *' but argument is of type 'enum_action'
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |                                             ~~~~~~~~~~~~^~~
+At top level:
+../Core/Src/main.c:146:22: warning: 'ackl' defined but not used [-Wunused-const-variable=]
+  146 | static const uint8_t ackl[] = "\rLittle Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:145:22: warning: 'ackr' defined but not used [-Wunused-const-variable=]
+  145 | static const uint8_t ackr[] = "\rRing Reference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:144:22: warning: 'ackm' defined but not used [-Wunused-const-variable=]
+  144 | static const uint8_t ackm[] = "\rMiddleReference Routine Complete\n";
+      |                      ^~~~
+../Core/Src/main.c:142:22: warning: 'ackt' defined but not used [-Wunused-const-variable=]
+  142 | static const uint8_t ackt[] = "\rThumb Reference Routine Complete\n";
+      |                      ^~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+22:17:34 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:224:51: error: incompatible type for argument 2 of 'start_action'
+  224 |     start_action(&fposition[action.finger], action.action);
+      |                                             ~~~~~~^~~~~~~
+      |                                                   |
+      |                                                   enum_action
+../Core/Src/main.c:156:57: note: expected 'st_action *' but argument is of type 'enum_action'
+  156 | void start_action(st_fposition * fposition, st_action * act);
+      |                                             ~~~~~~~~~~~~^~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+22:17:53 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: exo-esqueleto.elf
+ 
+arm-none-eabi-size   exo-esqueleto.elf 
+arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
+   text	   data	    bss	    dec	    hex	filename
+  13608	     24	   1856	  15488	   3c80	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+Finished building: exo-esqueleto.list
+ 
+22:17:57 **** Incremental Build of configuration Debug for project exo-esqueleto ****
 make -j8 all 
 arm-none-eabi-size   exo-esqueleto.elf 
    text	   data	    bss	    dec	    hex	filename
-  13016	     24	   1808	  14848	   3a00	exo-esqueleto.elf
+  13608	     24	   1856	  15488	   3c80	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+22:20:21 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: exo-esqueleto.elf
+ 
+arm-none-eabi-size   exo-esqueleto.elf 
+arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
+   text	   data	    bss	    dec	    hex	filename
+  13740	     24	   1856	  15620	   3d04	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+Finished building: exo-esqueleto.list
+ 
+22:23:07 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: exo-esqueleto.elf
+ 
+arm-none-eabi-size   exo-esqueleto.elf 
+arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
+   text	   data	    bss	    dec	    hex	filename
+  13752	     24	   1856	  15632	   3d10	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+Finished building: exo-esqueleto.list
+ 
+22:27:36 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-size   exo-esqueleto.elf 
+   text	   data	    bss	    dec	    hex	filename
+  13752	     24	   1856	  15632	   3d10	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+22:31:12 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-size   exo-esqueleto.elf 
+   text	   data	    bss	    dec	    hex	filename
+  13752	     24	   1856	  15632	   3d10	exo-esqueleto.elf
 Finished building: default.size.stdout
  

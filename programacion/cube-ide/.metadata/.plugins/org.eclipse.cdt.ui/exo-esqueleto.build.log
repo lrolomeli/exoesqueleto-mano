@@ -1,10 +1,10 @@
-10:28:49 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+22:31:12 **** Incremental Build of configuration Debug for project exo-esqueleto ****
 make -j8 all 
 arm-none-eabi-size   exo-esqueleto.elf 
    text	   data	    bss	    dec	    hex	filename
-  13016	     24	   1808	  14848	   3a00	exo-esqueleto.elf
+  13752	     24	   1856	  15632	   3d10	exo-esqueleto.elf
 Finished building: default.size.stdout
  
 
-10:28:49 Build Finished. 0 errors, 0 warnings. (took 299ms)
+22:31:13 Build Finished. 0 errors, 0 warnings. (took 312ms)
 
