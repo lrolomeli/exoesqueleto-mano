@@ -262,7 +262,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	enum_action act = stopped;
-	st_exoesk exoesk = {{0}, {0}, {0}, No};
+	st_exoesk exoesk = {{0}, {0}, {{0}}, No};
 
 	uint8_t buffer = 0;
 	uint8_t position_flag = 0;
@@ -468,23 +468,6 @@ static void alive_fn(void)
 	}
 }
 
-static void ref_routine_fn(st_exoesk * exoesk)
-{
-	exo_prepare(exoesk, Up, HOME_STEPS, Yes);
-}
-static void go_down_fn(st_exoesk * exoesk)
-{
-	exo_prepare(exoesk, Down, dfl_steps << stepping, No);
-}
-static void go_up_fn(st_exoesk * exoesk)
-{
-	exo_prepare(exoesk, Up, dfl_steps << stepping, No);
-}
-static void sinewave_fn(st_exoesk * exoesk)
-{
-
-}
-
 static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t position, uint8_t is_ref)
 {
 	for(uint8_t finger=thumb; finger<flength; finger++)
@@ -528,6 +511,23 @@ static void gotopos_fn(st_exoesk * exoesk, uint16_t position)
 		}
 	}
 	exoesk->in_operation = Yes;
+}
+
+static void ref_routine_fn(st_exoesk * exoesk)
+{
+	exo_prepare(exoesk, Up, HOME_STEPS, Yes);
+}
+static void go_down_fn(st_exoesk * exoesk)
+{
+	exo_prepare(exoesk, Down, dfl_steps << stepping, No);
+}
+static void go_up_fn(st_exoesk * exoesk)
+{
+	exo_prepare(exoesk, Up, dfl_steps << stepping, No);
+}
+static void sinewave_fn(st_exoesk * exoesk)
+{
+
 }
 
 static void clean_buffer(uint8_t * buf)
