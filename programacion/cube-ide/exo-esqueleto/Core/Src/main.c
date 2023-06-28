@@ -35,14 +35,29 @@ typedef enum{
 }enum_buffer_status;
 
 typedef enum{
-	emergency_rst = 0,
-	conn_success,
-	moving_forward,
-	tx_succeed,
-	moving_backward,
-	halt_state,
-	reference_routine,
-	disconn_success
+	Down = 0,
+	Up
+}enum_motion;
+
+typedef enum{
+	No = 0,
+	Yes
+}enum_in_operation;
+
+typedef enum{
+	not_used = 0,
+	reference_routine = 1,
+	all_way_down,
+	all_way_up,
+	sinewave,
+	gotoposition,
+	nothing,
+	de_select_thumb = 250,
+	de_select_index = 251,
+	de_select_middle = 252,
+	de_select_ring = 253,
+	de_select_little = 254,
+	stopped = 255
 }enum_action;
 
 typedef enum{
@@ -79,10 +94,19 @@ typedef enum{
 }enum_ports;
 
 typedef struct{
-	int32_t absolute_pos;
-	uint32_t steps_to_go;
-	uint8_t op_has_started;
-}st_fposition;
+	uint8_t thumbf:1;
+	uint8_t indexf:1;
+	uint8_t middlef:1;
+	uint8_t ringf:1;
+	uint8_t littlef:1;
+}btfld_fingers;
+
+typedef struct{
+	uint16_t absolute_pos[flength];
+	uint16_t go_to[flength];
+	uint8_t fingers_in_op[flength];
+	enum_in_operation in_operation;
+}st_exoesk;
 
 typedef struct{
 	const uint8_t port;
@@ -96,24 +120,18 @@ typedef struct {
 	const st_gpio_config_t home;
 }st_fconfig;
 
-typedef struct {
-	enum_action action;
-	enum_fingers finger;
-}st_action;
+typedef void(*func_ptr_t)(st_exoesk * exoesk);
+
+
 
 
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define YES 1
-#define NO 0
-#define DOWN 1
-#define UP 0
-#define FINISH 1
-#define dfl_steps 500
-#define HOME_STEPS 1
-#define COMPLETE 1
+
+#define dfl_steps (500u)
+#define HOME_STEPS (65535u)
 
 /* USER CODE END PD */
 
@@ -125,7 +143,8 @@ typedef struct {
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-static const st_fconfig fconfig[flength] = {
+
+static const st_fconfig exoconfig[flength] = {
 	/*       steps               direction                sleep                 home          */
 	{ {portA, GPIO_PIN_1}, 	{portA, GPIO_PIN_0},   {portB, GPIO_PIN_4},	 {portB, GPIO_PIN_9} },//thumb
 	{ {portB, GPIO_PIN_14},	{portB, GPIO_PIN_13},  {portB, GPIO_PIN_15}, {portB, GPIO_PIN_5} },//index
@@ -134,37 +153,113 @@ static const st_fconfig fconfig[flength] = {
 	{ {portA, GPIO_PIN_3}, 	{portA, GPIO_PIN_2},   {portB, GPIO_PIN_3},	 {portB, GPIO_PIN_8} }//little
 };
 
-static uint8_t buffer = 0;
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_stat home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
 static const enum_stepping stepping = sixteen_step;
-static const uint8_t ackt[] = "\rThumb Reference Routine Complete\n";
-static const uint8_t acki[] = "\rIndex Reference Routine Complete\n";
-static const uint8_t ackm[] = "\rMiddleReference Routine Complete\n";
-static const uint8_t ackr[] = "\rRing Reference Routine Complete\n";
-static const uint8_t ackl[] = "\rLittle Reference Routine Complete\n";
+//static const uint8_t ackt[] = "\rThumb Reference Routine Complete\n";
+//static const uint8_t acki[] = "\rIndex Reference Routine Complete\n";
+//static const uint8_t ackm[] = "\rMiddleReference Routine Complete\n";
+//static const uint8_t ackr[] = "\rRing Reference Routine Complete\n";
+//static const uint8_t ackl[] = "\rLittle Reference Routine Complete\n";
 
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-static void read_action(st_action * action);
-static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+static uint8_t is_finger_up(uint16_t finger_home_sensor);
+static void send_pulse(enum_ports port, uint16_t pin);
+static void motor_wakeup(enum_ports port, uint16_t pin);
+static void sleep_motor(enum_ports port, uint16_t pin);
+static void clean_buffer(uint8_t * buf);
+static void sinewave_fn(st_exoesk * exoesk);
+static void go_up_fn(st_exoesk * exoesk);
+static void go_down_fn(st_exoesk * exoesk);
+static void ref_routine_fn(st_exoesk * exoesk);
+static void gotopos_fn(st_exoesk * exoesk, uint16_t position);
+static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t position, uint8_t is_ref);
 static void alive_fn(void);
-void start_action(st_fposition * fposition, st_action * act);
-void clean_buffer(void);
-void sleep_motor(enum_ports port, uint16_t pin);
-void motor_wakeup(enum_ports port, uint16_t pin);
-uint8_t is_finger_up(uint16_t finger_home_sensor);
-void send_pulse(enum_ports port, uint16_t pin);
-void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
+static uint8_t send_step_pulses(st_exoesk * exoesk);
+static void finger_motion(st_exoesk * exoesk);
+static void toggle_finger(st_exoesk * exoesk, enum_action act);
+
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+func_ptr_t exo_preactions[5] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn, gotopos_fn};
+func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	if(exoconfig[thumb].home.pin == GPIO_Pin)
+	{
+		if(home_routine[thumb] == lost)
+		{
+			sleep_motor(exoconfig[thumb].sleep.port, exoconfig[thumb].sleep.pin);
+			home_routine[thumb] = home;
+		}
+	}
+
+	else if(exoconfig[index].home.pin == GPIO_Pin)
+	{
+		if(home_routine[index] == lost)
+		{
+			sleep_motor(exoconfig[index].sleep.port, exoconfig[index].sleep.pin);
+			home_routine[index] = home;
+		}
+	}
+
+	else if(exoconfig[middle].home.pin == GPIO_Pin)
+	{
+		if(home_routine[middle] == lost)
+		{
+			sleep_motor(exoconfig[middle].sleep.port, exoconfig[middle].sleep.pin);
+			home_routine[middle] = home;
+		}
+	}
+
+	else if(exoconfig[ring].home.pin == GPIO_Pin)
+	{
+		if(home_routine[ring] == lost)
+		{
+			sleep_motor(exoconfig[ring].sleep.port, exoconfig[ring].sleep.pin);
+			home_routine[ring] = home;
+		}
+	}
+
+	else if(exoconfig[little].home.pin == GPIO_Pin)
+	{
+		if(home_routine[little] == lost)
+		{
+			sleep_motor(exoconfig[little].sleep.port, exoconfig[little].sleep.pin);
+			home_routine[little] = home;
+		}
+	}
+
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
+	//waits until buffer is empty again
+	if(empty == buffer_status)
+	{
+		buffer_status = full;
+	}
+}
+
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
+{
+	if(htim->Instance == TIM3)
+	{
+		if(~timeout_flg)
+		{
+			timeout_flg = 1;
+		}
+	}
+}
 
 /* USER CODE END 0 */
 
@@ -175,8 +270,14 @@ void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	static st_fposition fposition[flength] = {{0, 0, NO}};
-	st_action action = {0};
+	uint16_t absolute_pos[flength];
+	uint16_t go_to[flength];
+	btfld_fingers fingers_in_op;
+	enum_action act = stopped;
+	st_exoesk exoesk = {{0}, {0}, {{0}}, No};
+
+	uint8_t buffer = 0;
+	uint8_t position_flag = 0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -213,7 +314,31 @@ int main(void)
 	{
 		if(full == buffer_status)
 		{
-			read_action(&action);
+			act = buffer;
+			if(position_flag)
+			{
+				exo_prepare_pos(&exoesk, (act-1)<<sixteen_step);
+				position_flag = 0;
+			}
+			else
+			{
+				if(act > not_used && act < gotoposition)
+				{
+					exo_preactions[act-1](&exoesk);
+				}
+				else if(act == gotoposition)
+				{
+					// set flag for entering position
+					position_flag = 1;
+				}
+				else if(act > nothing && act < stopped)
+				{
+					toggle_finger();
+				}
+			}
+
+
+
 			if(action.action == emergency_rst)
 			{
 				fposition[action.finger].op_has_started = NO;
@@ -232,29 +357,27 @@ int main(void)
 				fposition[action.finger].op_has_started = NO;
 				home_routine[action.finger] = lost;
 			}
-			clean_buffer();
+			clean_buffer(&buffer);
 			HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 
 		}
 
-		if(home_routine[action.finger] == home)
+		// In case any finger touches home button
+		// that finger has to stop moving
+		uint8_t finger=0;
+		for(finger=0; finger<flength; finger++)
 		{
-			sleep_motor(fconfig[action.finger].sleep.port, fconfig[action.finger].sleep.pin);
-			fposition[action.finger].op_has_started = NO;
-			fposition[action.finger].absolute_pos = 0;
-			home_routine[action.finger] = referenced;
+			if(home_routine[finger] == home)
+			{
+				exoesk.absolute_pos[finger] = 0;
+				home_routine[finger] = referenced;
+			}
+
 		}
 
 		if(timeout_flg)
 		{
-			if(fposition[action.finger].op_has_started)
-			{
-				if(send_step_pulses(fposition, &action) == FINISH)
-				{
-					sleep_motor(fconfig[action.finger].sleep.port, fconfig[action.finger].sleep.pin);
-					fposition[action.finger].op_has_started = NO;
-				}
-			}
+			finger_motion();
 			alive_fn();
 			timeout_flg = 0;
 		}
@@ -304,148 +427,71 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+static void toggle_finger(st_exoesk * exoesk, enum_action act)
 {
-	if(fconfig[thumb].home.pin == GPIO_Pin)
-	{
-		if(home_routine[thumb] == lost)
-		{
-			home_routine[thumb] = home;
-			HAL_UART_Transmit(&huart3, (const uint8_t *) ackt, sizeof(acki), 100);
-		}
-	}
+	uint8_t finger = act - de_select_thumb;
 
-	if(fconfig[index].home.pin == GPIO_Pin)
+	// case the finger is selected
+	if(exoesk.fingers_in_op & (1<<finger))
 	{
-		if(home_routine[index] == lost)
-		{
-			home_routine[index] = home;
-			HAL_UART_Transmit(&huart3, (const uint8_t *) acki, sizeof(acki), 100);
-		}
+		// deselect the finger
+		exoesk.fingers_in_op &= ~(1<<(finger));
 	}
-
-	if(fconfig[middle].home.pin == GPIO_Pin)
+	else
 	{
-		if(home_routine[middle] == lost)
-		{
-			home_routine[middle] = home;
-			HAL_UART_Transmit(&huart3, (const uint8_t *) ackm, sizeof(acki), 100);
-		}
+		// otherwise select it
+		exoesk.fingers_in_op |= (1<<(finger));
 	}
+}
 
-	if(fconfig[ring].home.pin == GPIO_Pin)
-	{
-		if(home_routine[ring] == lost)
-		{
-			home_routine[ring] = home;
-			HAL_UART_Transmit(&huart3, (const uint8_t *) ackr, sizeof(acki), 100);
-		}
-	}
+static void finger_motion(st_exoesk * exoesk)
+{
 
-	if(fconfig[little].home.pin == GPIO_Pin)
+	if(exoesk->fingers_in_op)
 	{
-		if(home_routine[little] == lost)
-		{
-			home_routine[little] = home;
-			HAL_UART_Transmit(&huart3, (const uint8_t *) ackl, sizeof(acki), 100);
-		}
+		send_step_pulses(exoesk);
 	}
 
 }
 
-void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
-	//waits until buffer is empty again
-	if(empty == buffer_status){
-		buffer_status = full;
-	}
-}
-
-void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
+static uint8_t send_step_pulses(st_exoesk * exoesk)
 {
-	if(htim->Instance == TIM3)
+
+	uint8_t finger = 0;
+	uint8_t counter = 0;
+
+	for(finger=0; finger<flength; finger++)
 	{
-		if(~timeout_flg)
+
+		if(exoesk->absolute_pos == exoesk->go_to[finger] || is_finger_up(exoconfig[finger].home.pin))
 		{
-			timeout_flg = 1;
+			sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+			counter++;
 		}
-	}
-}
-
-static void read_action(st_action * action)
-{
-	//compare byte
-	switch(buffer){
-	case '\e':
-		action->action = emergency_rst;
-		action->finger = flength;
-		return;
-	case 'f':
-
-		action->action = moving_forward;
-		action->finger = index;
-		return;
-	case 'b':
-		action->action = moving_backward;
-		action->finger = index;
-		return;
-	case 'h':
-		action->action = reference_routine;
-		action->finger = index;
-		return;
-	case 0:
-		action->action = halt_state;
-		return;
-	case '+':
-		action->action = halt_state;
-		return;
-	default:
-		action->action = halt_state;
-		return;
-	}
-}
-
-static uint8_t send_step_pulses(st_fposition * fposition, st_action * act)
-{
-
-	if(fposition[act->finger].steps_to_go > 0)
-	{
-		switch(act->action)
+		else
 		{
-		case reference_routine:
-			if(is_finger_up(fconfig[act->finger].home.pin)){
-				return FINISH;
+			send_pulse(exoconfig[finger].step.port, exoconfig[finger].step.pin);
+			if(exoesk->go_to[finger] > exoesk->absolute_pos)
+			{
+				exoesk->absolute_pos++;
 			}
 			else
 			{
-				send_pulse(fconfig[act->finger].step.port, fconfig[act->finger].step.pin);
-				return 0;
-			}
-		case moving_backward:
-			if(is_finger_up(fconfig[act->finger].home.pin)){
-				return FINISH;
-			}
-			else
-			{
-				send_pulse(fconfig[act->finger].step.port, fconfig[act->finger].step.pin);
-				fposition[act->finger].absolute_pos--;
-				fposition[act->finger].steps_to_go--;
-				return 0;
+				exoesk->absolute_pos--;
 			}
 
-		case moving_forward:
-			send_pulse(fconfig[act->finger].step.port, fconfig[act->finger].step.pin);
-			fposition[act->finger].absolute_pos++;
-			fposition[act->finger].steps_to_go--;
-			return 0;
-		default:
-			fposition[act->finger].steps_to_go = 0;
-			return FINISH;
 		}
 
 	}
-	else{
-		return FINISH;
+	if(counter < flength)
+	{
+		exoesk->fingers_in_op = Yes;
 	}
+	else
+	{
+		exoesk->fingers_in_op = No;
+	}
+
 }
 
 static void alive_fn(void)
@@ -456,50 +502,82 @@ static void alive_fn(void)
 	{
 		var--;
 	}
-	else{
+	else
+	{
 		var = 16000;
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
 }
 
-void start_action(st_fposition * fposition, st_action * act)
+static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t position, uint8_t is_ref)
 {
-	switch(act->action)
+	for(uint8_t finger=thumb; finger<flength; finger++)
 	{
-	case reference_routine:
-		set_direction(fconfig[act->finger].direction.port, fconfig[act->finger].direction.pin, UP);
-		home_routine[act->finger] = lost;
-		motor_wakeup(fconfig[act->finger].sleep.port, fconfig[act->finger].sleep.pin);
-		fposition->steps_to_go = HOME_STEPS;
-		fposition->op_has_started = YES;
-		break;
-	case moving_backward:
-		set_direction(fconfig[act->finger].direction.port, fconfig[act->finger].direction.pin, UP);
-		motor_wakeup(fconfig[act->finger].sleep.port, fconfig[act->finger].sleep.pin);
-		fposition->steps_to_go = dfl_steps << stepping;
-		fposition->op_has_started = YES;
-		break;
-	case moving_forward:
-		set_direction(fconfig[act->finger].direction.port, fconfig[act->finger].direction.pin, DOWN);
-		motor_wakeup(fconfig[act->finger].sleep.port, fconfig[act->finger].sleep.pin);
-		fposition->steps_to_go = dfl_steps << stepping;
-		fposition->op_has_started = YES;
-		break;
-	default:
-		fposition->steps_to_go = 0;
-		fposition->op_has_started = NO;
-		break;
+		if(((exoesk->fingers_in_op) & (1<<finger)))
+		{
+			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, direction);
+			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+			exoesk->go_to[finger] = position;
+			if(is_ref)
+			{
+				home_routine[finger] = lost;
+			}
+
+		}
 	}
+	exoesk->in_operation = Yes;
+}
+
+static void gotopos_fn(st_exoesk * exoesk, uint16_t position)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		enum_motion direction;
+		if(position > exoesk->absolute_pos[finger])
+		{
+			direction = Down;
+			exoesk->go_to[finger] = position - exoesk->absolute_pos[finger];
+		}
+		else
+		{
+			direction = Up;
+			exoesk->go_to[finger] = exoesk->absolute_pos[finger] - position;
+		}
+
+		if((*(exoesk->fingers_in_op) & (1<<finger)))
+		{
+			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, direction);
+			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+
+		}
+	}
+	exoesk->in_operation = Yes;
+}
+
+static void ref_routine_fn(st_exoesk * exoesk)
+{
+	exo_prepare(exoesk, Up, HOME_STEPS, Yes);
+}
+static void go_down_fn(st_exoesk * exoesk)
+{
+	exo_prepare(exoesk, Down, dfl_steps << stepping, No);
+}
+static void go_up_fn(st_exoesk * exoesk)
+{
+	exo_prepare(exoesk, Up, dfl_steps << stepping, No);
+}
+static void sinewave_fn(st_exoesk * exoesk)
+{
 
 }
 
-void clean_buffer()
+static void clean_buffer(uint8_t * buf)
 {
-	buffer = 0;
+	*buf = 0;
 	buffer_status = empty;
 }
 
-void sleep_motor(enum_ports port, uint16_t pin)
+static void sleep_motor(enum_ports port, uint16_t pin)
 {
 	if(port == portA)
 		HAL_GPIO_WritePin(GPIOA, pin, GPIO_PIN_RESET);
@@ -507,7 +585,7 @@ void sleep_motor(enum_ports port, uint16_t pin)
 		HAL_GPIO_WritePin(GPIOB, pin, GPIO_PIN_RESET);
 }
 
-void motor_wakeup(enum_ports port, uint16_t pin)
+static void motor_wakeup(enum_ports port, uint16_t pin)
 {
 	if(port == portA)
 		HAL_GPIO_WritePin(GPIOA, pin, GPIO_PIN_SET);
@@ -516,11 +594,8 @@ void motor_wakeup(enum_ports port, uint16_t pin)
 }
 
 
-void send_pulse(enum_ports port, uint16_t pin)
+static void send_pulse(enum_ports port, uint16_t pin)
 {
-	// if finger is index or middle or ring = portA
-	// else if finger is thumb or little = portB
-	//
 	if(port == portA)
 		HAL_GPIO_TogglePin(GPIOA, pin);
 	else
@@ -528,11 +603,12 @@ void send_pulse(enum_ports port, uint16_t pin)
 }
 
 
-uint8_t is_finger_up(uint16_t finger_home_sensor){
+static uint8_t is_finger_up(uint16_t finger_home_sensor)
+{
 	return HAL_GPIO_ReadPin(GPIOB, finger_home_sensor);
 }
 
-void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir)
+static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir)
 {
 	if(port == portA)
 		HAL_GPIO_WritePin(GPIOA, pin, dir);

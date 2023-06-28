@@ -19,3 +19,576 @@ arm-none-eabi-size   exo-esqueleto.elf
   13752	     24	   1856	  15632	   3d10	exo-esqueleto.elf
 Finished building: default.size.stdout
  
+09:05:20 **** Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+arm-none-eabi-gcc -o "exo-esqueleto.elf" @"objects.list"   -mcpu=cortex-m3 -T"C:\Users\luisrlp\Desktop\modular\exoesqueleto-mano\programacion\cube-ide\exo-esqueleto\STM32F103C8TX_FLASH.ld" --specs=nosys.specs -Wl,-Map="exo-esqueleto.map" -Wl,--gc-sections -static --specs=nano.specs -mfloat-abi=soft -mthumb -Wl,--start-group -lc -lm -Wl,--end-group
+Finished building target: exo-esqueleto.elf
+ 
+arm-none-eabi-size   exo-esqueleto.elf 
+arm-none-eabi-objdump -h -S  exo-esqueleto.elf  > "exo-esqueleto.list"
+   text	   data	    bss	    dec	    hex	filename
+  13792	     24	   1800	  15616	   3d00	exo-esqueleto.elf
+Finished building: default.size.stdout
+ 
+Finished building: exo-esqueleto.list
+ 
+09:22:55 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:150:33: error: unknown type name 'st_fposition'
+  150 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                                 ^~~~~~~~~~~~
+../Core/Src/main.c:150:59: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  150 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act);
+      |                                                           ^~~~~~~~~
+      |                                                           enum_action
+../Core/Src/main.c:152:19: error: unknown type name 'st_fposition'
+  152 | void start_action(st_fposition * fposition, st_action * act);
+      |                   ^~~~~~~~~~~~
+../Core/Src/main.c:152:45: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  152 | void start_action(st_fposition * fposition, st_action * act);
+      |                                             ^~~~~~~~~
+      |                                             enum_action
+../Core/Src/main.c:159:38: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  159 | static void read_action(uint8_t buf, st_action * act);
+      |                                      ^~~~~~~~~
+      |                                      enum_action
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:214:4: warning: implicit declaration of function 'read_action' [-Wimplicit-function-declaration]
+  214 |    read_action(buffer, &action);
+      |    ^~~~~~~~~~~
+../Core/Src/main.c:214:25: error: 'action' undeclared (first use in this function); did you mean 'active'?
+  214 |    read_action(buffer, &action);
+      |                         ^~~~~~
+      |                         active
+../Core/Src/main.c:214:25: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:217:5: error: 'fposition' undeclared (first use in this function)
+  217 |     fposition[action.finger].op_has_started = NO;
+      |     ^~~~~~~~~
+../Core/Src/main.c:222:5: warning: implicit declaration of function 'start_action' [-Wimplicit-function-declaration]
+  222 |     start_action(&fposition[action.finger], &action);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:248:4: warning: implicit declaration of function 'finger_motion' [-Wimplicit-function-declaration]
+  248 |    finger_motion();
+      |    ^~~~~~~~~~~~~
+../Core/Src/main.c:176:12: warning: unused variable 'finger' [-Wunused-variable]
+  176 |  st_finger finger[flength] = {{0, 0, 0, 0, NO}};
+      |            ^~~~~~
+../Core/Src/main.c: At top level:
+../Core/Src/main.c:366:27: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  366 | static void finger_motion(st_action * act, st_fposition * fpos){
+      |                           ^~~~~~~~~
+      |                           enum_action
+../Core/Src/main.c:366:44: error: unknown type name 'st_fposition'
+  366 | static void finger_motion(st_action * act, st_fposition * fpos){
+      |                                            ^~~~~~~~~~~~
+../Core/Src/main.c:379:38: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  379 | static void read_action(uint8_t buf, st_action * act)
+      |                                      ^~~~~~~~~
+      |                                      enum_action
+../Core/Src/main.c:413:33: error: unknown type name 'st_fposition'
+  413 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act)
+      |                                 ^~~~~~~~~~~~
+../Core/Src/main.c:413:59: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  413 | static uint8_t send_step_pulses(st_fposition * fposition, st_action * act)
+      |                                                           ^~~~~~~~~
+      |                                                           enum_action
+../Core/Src/main.c:473:19: error: unknown type name 'st_fposition'
+  473 | void start_action(st_fposition * fposition, st_action * act)
+      |                   ^~~~~~~~~~~~
+../Core/Src/main.c:473:45: error: unknown type name 'st_action'; did you mean 'enum_action'?
+  473 | void start_action(st_fposition * fposition, st_action * act)
+      |                                             ^~~~~~~~~
+      |                                             enum_action
+../Core/Src/main.c:138:28: warning: 'stepping' defined but not used [-Wunused-const-variable=]
+  138 | static const enum_stepping stepping = sixteen_step;
+      |                            ^~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:22:31 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:193:84: warning: initialization of 'void (*)(st_exoesk *)' from incompatible pointer type 'void (*)(st_exoesk *, uint16_t)' {aka 'void (*)(st_exoesk *, short unsigned int)'} [-Wincompatible-pointer-types]
+  193 | func_ptr_t exo_preactions[5] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn, gotopos_fn};
+      |                                                                                    ^~~~~~~~~~
+../Core/Src/main.c:193:84: note: (near initialization for 'exo_preactions[4]')
+../Core/Src/main.c:194:28: error: 'f1' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                            ^~
+../Core/Src/main.c:194:32: error: 'f2' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                ^~
+../Core/Src/main.c:194:36: error: 'f3' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                    ^~
+../Core/Src/main.c:194:40: error: 'f4' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                        ^~
+../Core/Src/main.c:194:44: error: 'f5' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                            ^~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:277:2: warning: braces around scalar initializer
+  277 |  st_exoesk exoesk = {{0}, {0}, {{0}}, No};
+      |  ^~~~~~~~~
+../Core/Src/main.c:277:2: note: (near initialization for 'exoesk.fingers_in_op.thumbf')
+../Core/Src/main.c:320:5: warning: implicit declaration of function 'exo_prepare_pos'; did you mean 'exo_prepare'? [-Wimplicit-function-declaration]
+  320 |     exo_prepare_pos(&exoesk, (act-1)<<sixteen_step);
+      |     ^~~~~~~~~~~~~~~
+      |     exo_prepare
+../Core/Src/main.c:336:6: error: too few arguments to function 'toggle_finger'
+  336 |      toggle_finger();
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:186:13: note: declared here
+  186 | static void toggle_finger(st_exoesk * exoesk, enum_action act);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:342:7: error: 'action' undeclared (first use in this function); did you mean 'active'?
+  342 |    if(action.action == emergency_rst)
+      |       ^~~~~~
+      |       active
+../Core/Src/main.c:342:7: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:342:24: error: 'emergency_rst' undeclared (first use in this function)
+  342 |    if(action.action == emergency_rst)
+      |                        ^~~~~~~~~~~~~
+../Core/Src/main.c:344:5: error: 'fposition' undeclared (first use in this function)
+  344 |     fposition[action.finger].op_has_started = NO;
+      |     ^~~~~~~~~
+../Core/Src/main.c:344:47: error: 'NO' undeclared (first use in this function); did you mean 'No'?
+  344 |     fposition[action.finger].op_has_started = NO;
+      |                                               ^~
+      |                                               No
+../Core/Src/main.c:349:5: warning: implicit declaration of function 'start_action' [-Wimplicit-function-declaration]
+  349 |     start_action(&fposition[action.finger], &action);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:380:4: error: too few arguments to function 'finger_motion'
+  380 |    finger_motion();
+      |    ^~~~~~~~~~~~~
+../Core/Src/main.c:185:13: note: declared here
+  185 | static void finger_motion(st_exoesk * exoesk);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:275:16: warning: unused variable 'fingers_in_op' [-Wunused-variable]
+  275 |  btfld_fingers fingers_in_op;
+      |                ^~~~~~~~~~~~~
+../Core/Src/main.c:274:11: warning: unused variable 'go_to' [-Wunused-variable]
+  274 |  uint16_t go_to[flength];
+      |           ^~~~~
+../Core/Src/main.c:273:11: warning: unused variable 'absolute_pos' [-Wunused-variable]
+  273 |  uint16_t absolute_pos[flength];
+      |           ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'toggle_finger':
+../Core/Src/main.c:435:11: error: 'exoesk' is a pointer; did you mean to use '->'?
+  435 |  if(exoesk.fingers_in_op & (1<<finger))
+      |           ^
+      |           ->
+../Core/Src/main.c:438:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  438 |   exoesk.fingers_in_op &= ~(1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c:443:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  443 |   exoesk.fingers_in_op |= (1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c: In function 'finger_motion':
+../Core/Src/main.c:450:5: error: used struct type value where scalar is required
+  450 |  if(exoesk->fingers_in_op)
+      |     ^~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:466:27: warning: comparison between pointer and integer
+  466 |   if(exoesk->absolute_pos == exoesk->go_to[finger] || is_finger_up(exoconfig[finger].home.pin))
+      |                           ^~
+../Core/Src/main.c:474:29: warning: comparison between pointer and integer
+  474 |    if(exoesk->go_to[finger] > exoesk->absolute_pos)
+      |                             ^
+../Core/Src/main.c:476:25: error: lvalue required as increment operand
+  476 |     exoesk->absolute_pos++;
+      |                         ^~
+../Core/Src/main.c:480:25: error: lvalue required as decrement operand
+  480 |     exoesk->absolute_pos--;
+      |                         ^~
+../Core/Src/main.c:488:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  488 |   exoesk->fingers_in_op = Yes;
+      |                           ^~~
+../Core/Src/main.c:492:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  492 |   exoesk->fingers_in_op = No;
+      |                           ^~
+../Core/Src/main.c:495:1: warning: no return statement in function returning non-void [-Wreturn-type]
+  495 | }
+      | ^
+../Core/Src/main.c: In function 'exo_prepare':
+../Core/Src/main.c:516:31: error: invalid operands to binary & (have 'btfld_fingers' and 'int')
+  516 |   if(((exoesk->fingers_in_op) & (1<<finger)))
+      |       ~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~
+      |              |                    |
+      |              btfld_fingers        int
+../Core/Src/main.c: In function 'gotopos_fn':
+../Core/Src/main.c:546:31: error: invalid operands to binary & (have 'btfld_fingers' and 'int')
+  546 |   if(((exoesk->fingers_in_op) & (1<<finger)))
+      |       ~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~
+      |              |                    |
+      |              btfld_fingers        int
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:23:10 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:193:84: warning: initialization of 'void (*)(st_exoesk *)' from incompatible pointer type 'void (*)(st_exoesk *, uint16_t)' {aka 'void (*)(st_exoesk *, short unsigned int)'} [-Wincompatible-pointer-types]
+  193 | func_ptr_t exo_preactions[5] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn, gotopos_fn};
+      |                                                                                    ^~~~~~~~~~
+../Core/Src/main.c:193:84: note: (near initialization for 'exo_preactions[4]')
+../Core/Src/main.c:194:28: error: 'f1' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                            ^~
+../Core/Src/main.c:194:32: error: 'f2' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                ^~
+../Core/Src/main.c:194:36: error: 'f3' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                    ^~
+../Core/Src/main.c:194:40: error: 'f4' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                        ^~
+../Core/Src/main.c:194:44: error: 'f5' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                            ^~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:277:2: warning: braces around scalar initializer
+  277 |  st_exoesk exoesk = {{0}, {0}, {{0}}, No};
+      |  ^~~~~~~~~
+../Core/Src/main.c:277:2: note: (near initialization for 'exoesk.fingers_in_op.thumbf')
+../Core/Src/main.c:320:5: warning: implicit declaration of function 'exo_prepare_pos'; did you mean 'exo_prepare'? [-Wimplicit-function-declaration]
+  320 |     exo_prepare_pos(&exoesk, (act-1)<<sixteen_step);
+      |     ^~~~~~~~~~~~~~~
+      |     exo_prepare
+../Core/Src/main.c:336:6: error: too few arguments to function 'toggle_finger'
+  336 |      toggle_finger();
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:186:13: note: declared here
+  186 | static void toggle_finger(st_exoesk * exoesk, enum_action act);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:342:7: error: 'action' undeclared (first use in this function); did you mean 'active'?
+  342 |    if(action.action == emergency_rst)
+      |       ^~~~~~
+      |       active
+../Core/Src/main.c:342:7: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:342:24: error: 'emergency_rst' undeclared (first use in this function)
+  342 |    if(action.action == emergency_rst)
+      |                        ^~~~~~~~~~~~~
+../Core/Src/main.c:344:5: error: 'fposition' undeclared (first use in this function)
+  344 |     fposition[action.finger].op_has_started = NO;
+      |     ^~~~~~~~~
+../Core/Src/main.c:344:47: error: 'NO' undeclared (first use in this function); did you mean 'No'?
+  344 |     fposition[action.finger].op_has_started = NO;
+      |                                               ^~
+      |                                               No
+../Core/Src/main.c:349:5: warning: implicit declaration of function 'start_action' [-Wimplicit-function-declaration]
+  349 |     start_action(&fposition[action.finger], &action);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:380:4: error: too few arguments to function 'finger_motion'
+  380 |    finger_motion();
+      |    ^~~~~~~~~~~~~
+../Core/Src/main.c:185:13: note: declared here
+  185 | static void finger_motion(st_exoesk * exoesk);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:275:16: warning: unused variable 'fingers_in_op' [-Wunused-variable]
+  275 |  btfld_fingers fingers_in_op;
+      |                ^~~~~~~~~~~~~
+../Core/Src/main.c:274:11: warning: unused variable 'go_to' [-Wunused-variable]
+  274 |  uint16_t go_to[flength];
+      |           ^~~~~
+../Core/Src/main.c:273:11: warning: unused variable 'absolute_pos' [-Wunused-variable]
+  273 |  uint16_t absolute_pos[flength];
+      |           ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'toggle_finger':
+../Core/Src/main.c:435:11: error: 'exoesk' is a pointer; did you mean to use '->'?
+  435 |  if(exoesk.fingers_in_op & (1<<finger))
+      |           ^
+      |           ->
+../Core/Src/main.c:438:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  438 |   exoesk.fingers_in_op &= ~(1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c:443:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  443 |   exoesk.fingers_in_op |= (1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c: In function 'finger_motion':
+../Core/Src/main.c:450:5: error: used struct type value where scalar is required
+  450 |  if(exoesk->fingers_in_op)
+      |     ^~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:466:27: warning: comparison between pointer and integer
+  466 |   if(exoesk->absolute_pos == exoesk->go_to[finger] || is_finger_up(exoconfig[finger].home.pin))
+      |                           ^~
+../Core/Src/main.c:474:29: warning: comparison between pointer and integer
+  474 |    if(exoesk->go_to[finger] > exoesk->absolute_pos)
+      |                             ^
+../Core/Src/main.c:476:25: error: lvalue required as increment operand
+  476 |     exoesk->absolute_pos++;
+      |                         ^~
+../Core/Src/main.c:480:25: error: lvalue required as decrement operand
+  480 |     exoesk->absolute_pos--;
+      |                         ^~
+../Core/Src/main.c:488:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  488 |   exoesk->fingers_in_op = Yes;
+      |                           ^~~
+../Core/Src/main.c:492:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  492 |   exoesk->fingers_in_op = No;
+      |                           ^~
+../Core/Src/main.c:495:1: warning: no return statement in function returning non-void [-Wreturn-type]
+  495 | }
+      | ^
+../Core/Src/main.c: In function 'exo_prepare':
+../Core/Src/main.c:516:31: error: invalid operands to binary & (have 'btfld_fingers' and 'int')
+  516 |   if(((exoesk->fingers_in_op) & (1<<finger)))
+      |       ~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~
+      |              |                    |
+      |              btfld_fingers        int
+../Core/Src/main.c: In function 'gotopos_fn':
+../Core/Src/main.c:546:3: error: aggregate value used where an integer was expected
+  546 |   if(((uint8_t)(exoesk->fingers_in_op) & (1<<finger)))
+      |   ^~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:24:10 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:193:84: warning: initialization of 'void (*)(st_exoesk *)' from incompatible pointer type 'void (*)(st_exoesk *, uint16_t)' {aka 'void (*)(st_exoesk *, short unsigned int)'} [-Wincompatible-pointer-types]
+  193 | func_ptr_t exo_preactions[5] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn, gotopos_fn};
+      |                                                                                    ^~~~~~~~~~
+../Core/Src/main.c:193:84: note: (near initialization for 'exo_preactions[4]')
+../Core/Src/main.c:194:28: error: 'f1' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                            ^~
+../Core/Src/main.c:194:32: error: 'f2' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                ^~
+../Core/Src/main.c:194:36: error: 'f3' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                    ^~
+../Core/Src/main.c:194:40: error: 'f4' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                        ^~
+../Core/Src/main.c:194:44: error: 'f5' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                            ^~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:277:2: warning: braces around scalar initializer
+  277 |  st_exoesk exoesk = {{0}, {0}, {{0}}, No};
+      |  ^~~~~~~~~
+../Core/Src/main.c:277:2: note: (near initialization for 'exoesk.fingers_in_op.thumbf')
+../Core/Src/main.c:320:5: warning: implicit declaration of function 'exo_prepare_pos'; did you mean 'exo_prepare'? [-Wimplicit-function-declaration]
+  320 |     exo_prepare_pos(&exoesk, (act-1)<<sixteen_step);
+      |     ^~~~~~~~~~~~~~~
+      |     exo_prepare
+../Core/Src/main.c:336:6: error: too few arguments to function 'toggle_finger'
+  336 |      toggle_finger();
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:186:13: note: declared here
+  186 | static void toggle_finger(st_exoesk * exoesk, enum_action act);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:342:7: error: 'action' undeclared (first use in this function); did you mean 'active'?
+  342 |    if(action.action == emergency_rst)
+      |       ^~~~~~
+      |       active
+../Core/Src/main.c:342:7: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:342:24: error: 'emergency_rst' undeclared (first use in this function)
+  342 |    if(action.action == emergency_rst)
+      |                        ^~~~~~~~~~~~~
+../Core/Src/main.c:344:5: error: 'fposition' undeclared (first use in this function)
+  344 |     fposition[action.finger].op_has_started = NO;
+      |     ^~~~~~~~~
+../Core/Src/main.c:344:47: error: 'NO' undeclared (first use in this function); did you mean 'No'?
+  344 |     fposition[action.finger].op_has_started = NO;
+      |                                               ^~
+      |                                               No
+../Core/Src/main.c:349:5: warning: implicit declaration of function 'start_action' [-Wimplicit-function-declaration]
+  349 |     start_action(&fposition[action.finger], &action);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:380:4: error: too few arguments to function 'finger_motion'
+  380 |    finger_motion();
+      |    ^~~~~~~~~~~~~
+../Core/Src/main.c:185:13: note: declared here
+  185 | static void finger_motion(st_exoesk * exoesk);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:275:16: warning: unused variable 'fingers_in_op' [-Wunused-variable]
+  275 |  btfld_fingers fingers_in_op;
+      |                ^~~~~~~~~~~~~
+../Core/Src/main.c:274:11: warning: unused variable 'go_to' [-Wunused-variable]
+  274 |  uint16_t go_to[flength];
+      |           ^~~~~
+../Core/Src/main.c:273:11: warning: unused variable 'absolute_pos' [-Wunused-variable]
+  273 |  uint16_t absolute_pos[flength];
+      |           ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'toggle_finger':
+../Core/Src/main.c:435:11: error: 'exoesk' is a pointer; did you mean to use '->'?
+  435 |  if(exoesk.fingers_in_op & (1<<finger))
+      |           ^
+      |           ->
+../Core/Src/main.c:438:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  438 |   exoesk.fingers_in_op &= ~(1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c:443:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  443 |   exoesk.fingers_in_op |= (1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c: In function 'finger_motion':
+../Core/Src/main.c:450:5: error: used struct type value where scalar is required
+  450 |  if(exoesk->fingers_in_op)
+      |     ^~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:466:27: warning: comparison between pointer and integer
+  466 |   if(exoesk->absolute_pos == exoesk->go_to[finger] || is_finger_up(exoconfig[finger].home.pin))
+      |                           ^~
+../Core/Src/main.c:474:29: warning: comparison between pointer and integer
+  474 |    if(exoesk->go_to[finger] > exoesk->absolute_pos)
+      |                             ^
+../Core/Src/main.c:476:25: error: lvalue required as increment operand
+  476 |     exoesk->absolute_pos++;
+      |                         ^~
+../Core/Src/main.c:480:25: error: lvalue required as decrement operand
+  480 |     exoesk->absolute_pos--;
+      |                         ^~
+../Core/Src/main.c:488:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  488 |   exoesk->fingers_in_op = Yes;
+      |                           ^~~
+../Core/Src/main.c:492:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  492 |   exoesk->fingers_in_op = No;
+      |                           ^~
+../Core/Src/main.c:495:1: warning: no return statement in function returning non-void [-Wreturn-type]
+  495 | }
+      | ^
+../Core/Src/main.c: In function 'exo_prepare':
+../Core/Src/main.c:516:31: error: invalid operands to binary & (have 'btfld_fingers' and 'int')
+  516 |   if(((exoesk->fingers_in_op) & (1<<finger)))
+      |       ~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~
+      |              |                    |
+      |              btfld_fingers        int
+../Core/Src/main.c: In function 'gotopos_fn':
+../Core/Src/main.c:547:29: error: subscripted value is neither array nor pointer nor vector
+  547 |   if(((exoesk->fingers_in_op[finger]) & (1<<finger)))
+      |                             ^
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
+14:24:35 **** Incremental Build of configuration Debug for project exo-esqueleto ****
+make -j8 all 
+arm-none-eabi-gcc "../Core/Src/main.c" -mcpu=cortex-m3 -std=gnu11 -g3 -DDEBUG -DUSE_HAL_DRIVER -DSTM32F103xB -c -I../Core/Inc -I../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I../Drivers/STM32F1xx_HAL_Driver/Inc -I../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I../Drivers/CMSIS/Include -O0 -ffunction-sections -fdata-sections -Wall -fstack-usage -fcyclomatic-complexity -MMD -MP -MF"Core/Src/main.d" -MT"Core/Src/main.o" --specs=nano.specs -mfloat-abi=soft -mthumb -o "Core/Src/main.o"
+../Core/Src/main.c:193:84: warning: initialization of 'void (*)(st_exoesk *)' from incompatible pointer type 'void (*)(st_exoesk *, uint16_t)' {aka 'void (*)(st_exoesk *, short unsigned int)'} [-Wincompatible-pointer-types]
+  193 | func_ptr_t exo_preactions[5] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn, gotopos_fn};
+      |                                                                                    ^~~~~~~~~~
+../Core/Src/main.c:193:84: note: (near initialization for 'exo_preactions[4]')
+../Core/Src/main.c:194:28: error: 'f1' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                            ^~
+../Core/Src/main.c:194:32: error: 'f2' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                ^~
+../Core/Src/main.c:194:36: error: 'f3' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                    ^~
+../Core/Src/main.c:194:40: error: 'f4' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                        ^~
+../Core/Src/main.c:194:44: error: 'f5' undeclared here (not in a function)
+  194 | func_ptr_t exoaction[5] = {f1, f2, f3, f4, f5};
+      |                                            ^~
+../Core/Src/main.c: In function 'main':
+../Core/Src/main.c:277:2: warning: braces around scalar initializer
+  277 |  st_exoesk exoesk = {{0}, {0}, {{0}}, No};
+      |  ^~~~~~~~~
+../Core/Src/main.c:277:2: note: (near initialization for 'exoesk.fingers_in_op.thumbf')
+../Core/Src/main.c:320:5: warning: implicit declaration of function 'exo_prepare_pos'; did you mean 'exo_prepare'? [-Wimplicit-function-declaration]
+  320 |     exo_prepare_pos(&exoesk, (act-1)<<sixteen_step);
+      |     ^~~~~~~~~~~~~~~
+      |     exo_prepare
+../Core/Src/main.c:336:6: error: too few arguments to function 'toggle_finger'
+  336 |      toggle_finger();
+      |      ^~~~~~~~~~~~~
+../Core/Src/main.c:186:13: note: declared here
+  186 | static void toggle_finger(st_exoesk * exoesk, enum_action act);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:342:7: error: 'action' undeclared (first use in this function); did you mean 'active'?
+  342 |    if(action.action == emergency_rst)
+      |       ^~~~~~
+      |       active
+../Core/Src/main.c:342:7: note: each undeclared identifier is reported only once for each function it appears in
+../Core/Src/main.c:342:24: error: 'emergency_rst' undeclared (first use in this function)
+  342 |    if(action.action == emergency_rst)
+      |                        ^~~~~~~~~~~~~
+../Core/Src/main.c:344:5: error: 'fposition' undeclared (first use in this function)
+  344 |     fposition[action.finger].op_has_started = NO;
+      |     ^~~~~~~~~
+../Core/Src/main.c:344:47: error: 'NO' undeclared (first use in this function); did you mean 'No'?
+  344 |     fposition[action.finger].op_has_started = NO;
+      |                                               ^~
+      |                                               No
+../Core/Src/main.c:349:5: warning: implicit declaration of function 'start_action' [-Wimplicit-function-declaration]
+  349 |     start_action(&fposition[action.finger], &action);
+      |     ^~~~~~~~~~~~
+../Core/Src/main.c:380:4: error: too few arguments to function 'finger_motion'
+  380 |    finger_motion();
+      |    ^~~~~~~~~~~~~
+../Core/Src/main.c:185:13: note: declared here
+  185 | static void finger_motion(st_exoesk * exoesk);
+      |             ^~~~~~~~~~~~~
+../Core/Src/main.c:275:16: warning: unused variable 'fingers_in_op' [-Wunused-variable]
+  275 |  btfld_fingers fingers_in_op;
+      |                ^~~~~~~~~~~~~
+../Core/Src/main.c:274:11: warning: unused variable 'go_to' [-Wunused-variable]
+  274 |  uint16_t go_to[flength];
+      |           ^~~~~
+../Core/Src/main.c:273:11: warning: unused variable 'absolute_pos' [-Wunused-variable]
+  273 |  uint16_t absolute_pos[flength];
+      |           ^~~~~~~~~~~~
+../Core/Src/main.c: In function 'toggle_finger':
+../Core/Src/main.c:435:11: error: 'exoesk' is a pointer; did you mean to use '->'?
+  435 |  if(exoesk.fingers_in_op & (1<<finger))
+      |           ^
+      |           ->
+../Core/Src/main.c:438:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  438 |   exoesk.fingers_in_op &= ~(1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c:443:9: error: 'exoesk' is a pointer; did you mean to use '->'?
+  443 |   exoesk.fingers_in_op |= (1<<(finger));
+      |         ^
+      |         ->
+../Core/Src/main.c: In function 'finger_motion':
+../Core/Src/main.c:450:5: error: used struct type value where scalar is required
+  450 |  if(exoesk->fingers_in_op)
+      |     ^~~~~~
+../Core/Src/main.c: In function 'send_step_pulses':
+../Core/Src/main.c:466:27: warning: comparison between pointer and integer
+  466 |   if(exoesk->absolute_pos == exoesk->go_to[finger] || is_finger_up(exoconfig[finger].home.pin))
+      |                           ^~
+../Core/Src/main.c:474:29: warning: comparison between pointer and integer
+  474 |    if(exoesk->go_to[finger] > exoesk->absolute_pos)
+      |                             ^
+../Core/Src/main.c:476:25: error: lvalue required as increment operand
+  476 |     exoesk->absolute_pos++;
+      |                         ^~
+../Core/Src/main.c:480:25: error: lvalue required as decrement operand
+  480 |     exoesk->absolute_pos--;
+      |                         ^~
+../Core/Src/main.c:488:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  488 |   exoesk->fingers_in_op = Yes;
+      |                           ^~~
+../Core/Src/main.c:492:27: error: incompatible types when assigning to type 'btfld_fingers' from type 'int'
+  492 |   exoesk->fingers_in_op = No;
+      |                           ^~
+../Core/Src/main.c:495:1: warning: no return statement in function returning non-void [-Wreturn-type]
+  495 | }
+      | ^
+../Core/Src/main.c: In function 'exo_prepare':
+../Core/Src/main.c:516:31: error: invalid operands to binary & (have 'btfld_fingers' and 'int')
+  516 |   if(((exoesk->fingers_in_op) & (1<<finger)))
+      |       ~~~~~~~~~~~~~~~~~~~~~~~ ^ ~~~~~~~~~~~
+      |              |                    |
+      |              btfld_fingers        int
+../Core/Src/main.c: In function 'gotopos_fn':
+../Core/Src/main.c:547:7: error: invalid type argument of unary '*' (have 'btfld_fingers')
+  547 |   if((*(exoesk->fingers_in_op) & (1<<finger)))
+      |       ^~~~~~~~~~~~~~~~~~~~~~~~
+make: *** [Core/Src/subdir.mk:43: Core/Src/main.o] Error 1
+"make -j8 all" terminated with exit code 2. Build might be incomplete.
