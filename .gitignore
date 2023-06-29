@@ -1,1 +1,15 @@
 ~$*
+
+*.o
+programacion/cube-ide/.metadata/*
+
+programacion/cube-ide/exo-esqueleto/*.launch
+programacion/cube-ide/exo-esqueleto/.mxproject
+programacion/cube-ide/exo-esqueleto/.cproject
+programacion/cube-ide/exo-esqueleto/.project
+programacion/cube-ide/exo-esqueleto/Core/Startup/*
+programacion/cube-ide/exo-esqueleto/Debug/*
+programacion/cube-ide/exo-esqueleto/Drivers/*
+programacion/cube-ide/exo-esqueleto/.settings/*
+
+programacion/pythongui/__pycache__/*
