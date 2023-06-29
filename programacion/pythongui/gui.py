@@ -11,15 +11,28 @@ class Exoesqueleto(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ser = None
+        self.thumb_v = False
+        self.index_v = False
+        self.middle_v = False
+        self.ring_v = False
+        self.little_v = False
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+        self.ui.label_thumb.setVisible(False)
+        self.ui.label_index.setVisible(False)
+        self.ui.label_middle.setVisible(False)
+        self.ui.label_ring.setVisible(False)
+        self.ui.label_little.setVisible(False)
         self.ui.mvdwn_bt.clicked.connect(self.move_down)
         self.ui.mvup_bt.clicked.connect(self.move_up)
-        self.ui.rock_bt.clicked.connect(self.rock)
-        self.ui.elgnt_bt.clicked.connect(self.elegant)
         self.ui.home_bt.clicked.connect(self.home)
         self.ui.bluetooth_bt.clicked.connect(self.connect_bluetooth)
-        
+        self.ui.indx_bt.clicked.connect(self.index)
+        self.ui.thumb_bt.clicked.connect(self.thumb)
+        self.ui.middle_bt.clicked.connect(self.middle)
+        self.ui.ring_bt.clicked.connect(self.ring)
+        self.ui.little_bt.clicked.connect(self.little)
+
     def closeEvent(self, event):
         if self.ser is not None:
             print(self.ser)
@@ -31,47 +44,64 @@ class Exoesqueleto(QMainWindow):
     def connect_bluetooth(self):
         self.ser = serial.Serial(port='COM3', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
         print("connected")
-    def rock(self):
-        print("rock")
-        h = 'h'
-        f = 'f'
-        b = 'b'
-        self.ser.write(h.encode())
-        time.sleep(4)
-        self.ser.write(f.encode())
-        time.sleep(1)
-        self.ser.write(f.encode())
-        time.sleep(1)
-        self.ser.write(f.encode())
-        time.sleep(1)
-        self.ser.write(b.encode())
-        print(self.ser)
+        
+    def thumb(self):
+        self.thumb_v = not self.thumb_v
+        if self.thumb_v:        
+            self.ser.write(bytes.fromhex("7A"))
+        else:
+            self.ser.write(bytes.fromhex("75"))
+        self.ui.label_thumb.setVisible(self.thumb_v)
 
+    def index(self):
+        self.index_v = not self.index_v
+        if self.index_v:        
+            self.ser.write(bytes.fromhex("7B"))
+        else:
+            self.ser.write(bytes.fromhex("76"))
+        self.ui.label_index.setVisible(self.index_v)
 
+    def middle(self):
+        self.middle_v = not self.middle_v
+        if self.middle_v:        
+            self.ser.write(bytes.fromhex("7C"))
+        else:
+            self.ser.write(bytes.fromhex("77"))
+        self.ui.label_middle.setVisible(self.middle_v)
+
+    def ring(self):
+        self.ring_v = not self.ring_v
+        if self.ring_v:        
+            self.ser.write(bytes.fromhex("7D"))
+        else:
+            self.ser.write(bytes.fromhex("78"))
+        self.ui.label_ring.setVisible(self.ring_v)
+
+    def little(self):
+        self.little_v = not self.little_v
+        if self.little_v:        
+            self.ser.write(bytes.fromhex("7E"))
+        else:
+            self.ser.write(bytes.fromhex("79"))
+        self.ui.label_little.setVisible(self.little_v)
 
     def move_up(self):
         print("up")
-        b = 'b'
-        self.ser.write(b.encode())
-        time.sleep(1)
+        self.ser.write(bytes.fromhex("03"))
+        #time.sleep(1)
         print(self.ser)
     
     def move_down(self):
         print("down")
-        f = 'f'
-        self.ser.write(f.encode())
-        time.sleep(1)
+        self.ser.write(bytes.fromhex("02"))
+        #time.sleep(1)
         print(self.ser)
 
     def home(self):
         print("home")
-        h = 'h'
-        self.ser.write(h.encode())
-        time.sleep(4)
+        self.ser.write(bytes.fromhex("01"))
+        #time.sleep(4)
         print(self.ser)
-
-    def elegant(self):
-        print("elegant")
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)

@@ -35,8 +35,8 @@ typedef enum{
 }enum_buffer_status;
 
 typedef enum{
-	Down = 0,
-	Up
+	Up = 0,
+	Down
 }enum_motion;
 
 typedef enum{
@@ -45,19 +45,28 @@ typedef enum{
 }enum_in_operation;
 
 typedef enum{
-	not_used = 0,
-	reference_routine = 1,
-	all_way_down,
-	all_way_up,
-	sinewave,
-	gotoposition,
-	nothing,
-	de_select_thumb = 250,
-	de_select_index = 251,
-	de_select_middle = 252,
-	de_select_ring = 253,
-	de_select_little = 254,
-	stopped = 255
+	not_used = 0x00,
+	reference_routine = 0x01,
+	all_way_down  = 0x02,
+	all_way_up  = 0x03,
+	sinewave  = 0x04,
+	gotoposition  = 0x05,
+	reserved_plus=0x2B,
+	reserved_minus=0x2D,
+	reserved_major_C = 0x43,
+	reserved_major_D = 0x44,
+	nothing=0x74,
+	deselect_thumb = 0x75,
+	deselect_index = 0x76,
+	deselect_middle = 0x77,
+	deselect_ring = 0x78,
+	deselect_little = 0x79,
+	select_thumb = 0x7A,
+	select_index = 0x7B,
+	select_middle = 0x7C,
+	select_ring = 0x7D,
+	select_little = 0x7E,
+	stopped = 0x7F
 }enum_action;
 
 typedef enum{
@@ -121,9 +130,11 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
-#define dfl_steps (500u)
-#define HOME_STEPS (65535u)
+//#define test
+#define dfl_steps (500U)
+#define UNKNOWN (65535U)
+#define MAX_POSITION (24000U)
+#define HOME_POSITION (0U)
 
 /* USER CODE END PD */
 
@@ -171,12 +182,13 @@ static void go_up_fn(st_exoesk * exoesk);
 static void go_down_fn(st_exoesk * exoesk);
 static void ref_routine_fn(st_exoesk * exoesk);
 static void gotopos_fn(st_exoesk * exoesk, uint16_t position);
-static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t position, uint8_t is_ref);
+static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t position);
 static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
 static void finger_motion(st_exoesk * exoesk);
 static void toggle_finger(st_exoesk * exoesk, enum_action act);
-
+static void exo_init(st_exoesk * exoesk);
+static void home_routine_fn(st_exoesk * exoesk);
 
 /* USER CODE END PFP */
 
@@ -261,8 +273,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	enum_action act = stopped;
-	st_exoesk exoesk = {{0}, {0}, {0}, No};
+	enum_action act = reference_routine;
+	st_exoesk exoesk = {{UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN,UNKNOWN}, {0}, {0}, No};
 
 	uint8_t buffer = 0;
 	uint8_t position_flag = 0;
@@ -293,6 +305,7 @@ int main(void)
 
 	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 	HAL_TIM_Base_Start_IT(&htim3);
+	exo_init(&exoesk);
 
   /* USER CODE END 2 */
 
@@ -323,6 +336,18 @@ int main(void)
 				{
 					toggle_finger(&exoesk, act);
 				}
+				else if(act == reserved_major_C)
+				{
+					uint8_t finger=0;
+					for(finger=0; finger<flength; finger++)
+					{
+						exoesk.fingers_in_op[finger] = No;
+					}
+				}
+				else
+				{
+
+				}
 			}
 
 			clean_buffer(&buffer);
@@ -337,7 +362,8 @@ int main(void)
 		{
 			if(home_routine[finger] == home)
 			{
-				exoesk.absolute_pos[finger] = 0;
+				sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+				exoesk.absolute_pos[finger] = HOME_POSITION;
 				home_routine[finger] = referenced;
 			}
 
@@ -397,16 +423,22 @@ void SystemClock_Config(void)
 
 static void toggle_finger(st_exoesk * exoesk, enum_action act)
 {
-	uint8_t finger = act - de_select_thumb;
+	uint8_t finger = (act - deselect_thumb);
 
-	exoesk->fingers_in_op[finger] = (exoesk->fingers_in_op[finger]) ? 0  : 1 ;
+	if(finger < flength){
+		exoesk->fingers_in_op[finger % flength] = No;
+	}
+	else
+	{
+		exoesk->fingers_in_op[finger % flength] = Yes;
+	}
 
 }
 
 static void finger_motion(st_exoesk * exoesk)
 {
 
-	if(exoesk->fingers_in_op)
+	if(exoesk->in_operation)
 	{
 		send_step_pulses(exoesk);
 	}
@@ -421,8 +453,11 @@ static void send_step_pulses(st_exoesk * exoesk)
 
 	for(finger=0; finger<flength; finger++)
 	{
-
-		if(exoesk->absolute_pos[finger] == exoesk->go_to[finger] || is_finger_up(exoconfig[finger].home.pin))
+		// if the motor finger has reached the go_to position it sleeps
+		// as well as if the motor is moving back and the finger has reached the home position
+		// or in other words if the go_to position is smaller than absolute position and the finger has reached the home position
+		// then it has to stop, not if the motor is going on the other way.
+		if((exoesk->absolute_pos[finger] == exoesk->go_to[finger]) || (is_finger_up(exoconfig[finger].home.pin) && exoesk->go_to[finger] < exoesk->absolute_pos[finger]))
 		{
 			sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 			counter++;
@@ -470,22 +505,46 @@ static void alive_fn(void)
 
 static void ref_routine_fn(st_exoesk * exoesk)
 {
-	exo_prepare(exoesk, Up, HOME_STEPS, Yes);
+	home_routine_fn(exoesk);
 }
 static void go_down_fn(st_exoesk * exoesk)
 {
-	exo_prepare(exoesk, Down, dfl_steps << stepping, No);
+	exo_prepare(exoesk, Down, dfl_steps << stepping);
 }
 static void go_up_fn(st_exoesk * exoesk)
 {
-	exo_prepare(exoesk, Up, dfl_steps << stepping, No);
+	exo_prepare(exoesk, Up, dfl_steps << stepping);
 }
 static void sinewave_fn(st_exoesk * exoesk)
 {
 
 }
 
-static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t position, uint8_t is_ref)
+static void home_routine_fn(st_exoesk * exoesk)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		if(exoesk->fingers_in_op[finger])
+		{
+			if(is_finger_up(home_routine[finger]))
+			{
+				exoesk->absolute_pos[finger] = HOME_POSITION;
+				home_routine[finger] = referenced;
+			}
+			else
+			{
+				set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
+				exoesk->absolute_pos[finger] = UNKNOWN;
+				motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+				exoesk->go_to[finger] = HOME_POSITION;
+				home_routine[finger] = lost;
+			}
+		}
+	}
+	exoesk->in_operation = Yes;
+}
+
+static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t steps_to_go)
 {
 	for(uint8_t finger=thumb; finger<flength; finger++)
 	{
@@ -493,15 +552,49 @@ static void exo_prepare(st_exoesk * exoesk, enum_motion direction, uint16_t posi
 		{
 			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, direction);
 			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-			exoesk->go_to[finger] = position;
-			if(is_ref)
+
+			if(direction == Down && exoesk->absolute_pos[finger] <= (MAX_POSITION-steps_to_go))
 			{
-				home_routine[finger] = lost;
+				exoesk->go_to[finger] += steps_to_go;
 			}
+			// Si vas para arriba solo checa que lo que vas a avanzar no sea mas de lo permitido
+			// es decir que la posicion en la que estas + lo que vas a avanzar
+			else if(direction == Up && exoesk->absolute_pos[finger] >= steps_to_go )
+			{
+				exoesk->go_to[finger] -= steps_to_go;
+			}
+			else{
+
+			}
+
 
 		}
 	}
 	exoesk->in_operation = Yes;
+}
+
+static void exo_init(st_exoesk * exoesk)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+#ifdef test
+		exoesk->fingers_in_op[index] = Yes;
+#else
+		exoesk->fingers_in_op[finger] = Yes;
+#endif
+	}
+
+	home_routine_fn(exoesk);
+
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+#ifdef test
+		exoesk->fingers_in_op[index] = No;
+#else
+		exoesk->fingers_in_op[finger] = No;
+#endif
+	}
+
 }
 
 static void gotopos_fn(st_exoesk * exoesk, uint16_t position)
