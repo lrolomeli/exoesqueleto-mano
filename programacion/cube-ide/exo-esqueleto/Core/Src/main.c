@@ -131,16 +131,6 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 #define MAX_POSITION 	((1500U)<<(SYS_USED_STEP))
 #define HOME_POSITION 	(0U)
 
-
-
-typedef enum{
-	full_step = 0,
-	half_step,
-	quarter_step,
-	eigth_step,
-	sixteen_step
-}enum_stepping;
-
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -404,7 +394,7 @@ static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action a
 {
 	if(*pos_flag)
 	{
-		gotopos_fn(exoesk, (act-1)<<sixteen_step);
+		gotopos_fn(exoesk, (act-1)<<Sixteen_Step);
 		*pos_flag = 0;
 	}
 	else
@@ -677,7 +667,7 @@ static void exo_init(st_exoesk * exoesk)
 	if(is_finger_up(exoconfig[index].home.pin))
 	{
 		exoesk->fingers_in_op[index] = Yes;
-		exoesk->go_to[index] = Home_Steps<<sixteen_step;
+		exoesk->go_to[index] = Home_Steps;
 		exoesk->absolute_pos[index] = HOME_POSITION;
 		set_direction(exoconfig[index].direction.port, exoconfig[index].direction.pin, Down);
 		motor_wakeup(exoconfig[index].sleep.port, exoconfig[index].sleep.pin);
@@ -696,7 +686,7 @@ static void exo_init(st_exoesk * exoesk)
 		if(is_finger_up(exoconfig[finger].home.pin))
 		{
 			exoesk->fingers_in_op[finger] = Yes;
-			exoesk->go_to[finger] = Home_Steps<<sixteen_step;
+			exoesk->go_to[finger] = Home_Steps;
 			exoesk->absolute_pos[finger] = HOME_POSITION;
 			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
 			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
