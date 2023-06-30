@@ -71,23 +71,10 @@ typedef enum{
 }enum_action;
 
 typedef enum{
-	active = 0,
-	passive
-}enum_action_cat;
-
-typedef enum{
 	lost = 0,
 	home,
 	referenced
 }enum_motor_stat;
-
-typedef enum{
-	full_step = 0,
-	half_step,
-	quarter_step,
-	eigth_step,
-	sixteen_step
-}enum_stepping;
 
 typedef enum{
 	thumb = 0,
@@ -129,11 +116,30 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
 #define test
-#define Home_Steps (700U)
-#define dfl_steps (500U)
-#define UNKNOWN (65535U)
-#define MAX_POSITION (24000U)
-#define HOME_POSITION (0U)
+
+#define Full_Step 		(0U)
+#define Half_Step 		(1U)
+#define Quarter_Step 	(2U)
+#define Eigth_Step 		(3U)
+#define Sixteen_Step 	(4U)
+
+#define SYS_USED_STEP (Sixteen_Step)
+
+#define Default_Steps 	((500U)<<(SYS_USED_STEP))
+#define Home_Steps 		((700U)<<(SYS_USED_STEP))
+#define UNKNOWN 		((4095U)<<(SYS_USED_STEP))
+#define MAX_POSITION 	((1500U)<<(SYS_USED_STEP))
+#define HOME_POSITION 	(0U)
+
+
+
+typedef enum{
+	full_step = 0,
+	half_step,
+	quarter_step,
+	eigth_step,
+	sixteen_step
+}enum_stepping;
 
 /* USER CODE END PD */
 
