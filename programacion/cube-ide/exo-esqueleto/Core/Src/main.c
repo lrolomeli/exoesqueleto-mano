@@ -115,7 +115,7 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define test
+//#define test
 
 #define Full_Step 		(0U)
 #define Half_Step 		(1U)
