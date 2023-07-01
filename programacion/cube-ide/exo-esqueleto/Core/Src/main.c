@@ -90,6 +90,13 @@ typedef enum{
 	portB,
 }enum_ports;
 
+typedef enum{
+	normal = 0,
+	fast = 1,
+	as_hell
+
+}enum_speed;
+
 typedef struct{
 	uint16_t absolute_pos[flength];
 	uint16_t go_to[flength];
@@ -115,21 +122,7 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define test
-
-#define Full_Step 		(0U)
-#define Half_Step 		(1U)
-#define Quarter_Step 	(2U)
-#define Eigth_Step 		(3U)
-#define Sixteen_Step 	(4U)
-
-#define SYS_USED_STEP (Sixteen_Step)
-
-#define Default_Steps 	((500U)<<(SYS_USED_STEP))
-#define Home_Steps 		((700U)<<(SYS_USED_STEP))
-#define UNKNOWN 		((4095U)<<(SYS_USED_STEP))
-#define MAX_POSITION 	((1500U)<<(SYS_USED_STEP))
-#define HOME_POSITION 	(0U)
+#define test
 
 /* USER CODE END PD */
 
@@ -298,11 +291,11 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_USART3_UART_Init();
-  MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
 	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
+	htim3.Init.Period = htim3.Init.Period >> (as_hell);
 	HAL_TIM_Base_Start_IT(&htim3);
 	exo_init(&exoesk);
 

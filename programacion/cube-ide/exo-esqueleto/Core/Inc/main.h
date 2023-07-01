@@ -59,7 +59,19 @@ void Error_Handler(void);
 /* Private defines -----------------------------------------------------------*/
 
 /* USER CODE BEGIN Private defines */
+#define Full_Step 		(0U)
+#define Half_Step 		(1U)
+#define Quarter_Step 	(2U)
+#define Eigth_Step 		(3U)
+#define Sixteen_Step 	(4U)
 
+#define SYS_USED_STEP (Sixteen_Step)
+
+#define Default_Steps 	((500U)<<(SYS_USED_STEP))
+#define Home_Steps 		((700U)<<(SYS_USED_STEP))
+#define UNKNOWN 		((4095U)<<(SYS_USED_STEP))
+#define MAX_POSITION 	((1500U)<<(SYS_USED_STEP))
+#define HOME_POSITION 	(0U)
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
