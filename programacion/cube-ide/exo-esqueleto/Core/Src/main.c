@@ -122,7 +122,7 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define test
+//#define test
 
 /* USER CODE END PD */
 
@@ -144,7 +144,10 @@ static const st_fconfig exoconfig[flength] = {
 	{ {portA, GPIO_PIN_3}, 	{portA, GPIO_PIN_2},   {portB, GPIO_PIN_3},	 {portB, GPIO_PIN_8} }//little
 };
 
-static enum_fingers finger_under_test = thumb;
+#ifdef test
+static enum_fingers finger_under_test = ring;
+#endif
+
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_stat home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
@@ -305,7 +308,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
 
 	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
-	htim3.Init.Period = htim3.Init.Period >> (as_hell);
+	htim3.Init.Period = htim3.Init.Period >> (normal);
 	HAL_TIM_Base_Start_IT(&htim3);
 	exo_init(&exoesk);
 
@@ -691,8 +694,9 @@ static void exo_init(st_exoesk * exoesk)
 			exoesk->fingers_in_op[finger] = Yes;
 			exoesk->go_to[finger] = Home_Steps;
 			exoesk->absolute_pos[finger] = HOME_POSITION;
-			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
+			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
 			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+			counter++;
 		}
 		else
 		{
@@ -701,10 +705,7 @@ static void exo_init(st_exoesk * exoesk)
 			exoesk->absolute_pos[finger] = UNKNOWN;
 		}
 	}
-
-	exoesk->in_operation = Yes;
 #endif
-
 	if(counter>0)
 		exoesk->in_operation = Yes;
 }
