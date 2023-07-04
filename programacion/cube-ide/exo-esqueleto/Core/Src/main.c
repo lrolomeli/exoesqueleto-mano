@@ -280,9 +280,10 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	st_exoesk exoesk = {{0}, {0}, {0}, No};
-	uint8_t referenced_system = 0;
+	uint8_t referenced_system = No;
 	uint8_t buffer = 0;
 	uint8_t position_flag = 0;
+	uint8_t home_send = No;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -333,20 +334,22 @@ int main(void)
 
 		if(timeout_flg)
 		{
-			if(referenced_system == Yes)
+			if(exoesk.in_operation)
 			{
 				finger_motion(&exoesk);
+			}
+			else if(No == referenced_system && No == home_send)
+			{
+				// Si llegamos hasta aqui ya no debe haber ningun
+				// dedo presionando ningun boton.
+				send_home(&exoesk);
+				home_send = Yes;
 			}
 			else
 			{
-				finger_motion(&exoesk);
-
-				// At this moment no finger is touching a button
-				if(exoesk.in_operation == No)
-				{
-					send_home(&exoesk);
-				}
+				exoesk.in_operation = No;
 			}
+
 			alive_fn();
 			timeout_flg = 0;
 		}
@@ -484,15 +487,15 @@ static uint8_t is_system_referenced(void)
 
 #else
 	uint8_t finger=0;
-	uint8_t counter = 0;
+	uint8_t fingers_ref = 0;
 	for(finger=0; finger<flength; finger++)
 	{
 		if(home_routine[finger] == referenced)
 		{
-			counter++;
+			fingers_ref++;
 		}
 	}
-	if(counter == flength)
+	if(fingers_ref == flength)
 	{
 		return Yes;
 	}
@@ -511,7 +514,8 @@ static void finger_motion(st_exoesk * exoesk)
 
 static void send_step_pulses(st_exoesk * exoesk)
 {
-	uint8_t counter = 0;
+	uint8_t fingers_ready = 0;
+	uint8_t fingers_in_op = 0;
 
 #ifdef test
 	// case finger is active
@@ -520,7 +524,7 @@ static void send_step_pulses(st_exoesk * exoesk)
 		if(exoesk->go_to[finger_under_test] == exoesk->absolute_pos[finger_under_test])
 		{
 			sleep_motor(exoconfig[finger_under_test].sleep.port, exoconfig[finger_under_test].sleep.pin);
-			counter++;
+			fingers_ready++;
 		}
 		else
 		{
@@ -544,10 +548,11 @@ static void send_step_pulses(st_exoesk * exoesk)
 		// case finger is active
 		if(exoesk->fingers_in_op[finger])
 		{
+			fingers_in_op++;
 			if(exoesk->go_to[finger] == exoesk->absolute_pos[finger])
 			{
 				sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-				counter++;
+				fingers_ready++;
 			}
 			else
 			{
@@ -569,9 +574,9 @@ static void send_step_pulses(st_exoesk * exoesk)
 #endif
 
 #ifdef test
-	if(counter < 1)
+	if(fingers_ready < 1)
 #else
-	if(counter < flength)
+	if(fingers_ready < fingers_in_op)
 #endif
 	{
 		exoesk->in_operation = Yes;
@@ -585,7 +590,7 @@ static void send_step_pulses(st_exoesk * exoesk)
 
 static void alive_fn(void)
 {
-	static uint16_t var = 16000;
+	static uint16_t var = 2000;
 
 	if(var > 0)
 	{
@@ -593,7 +598,7 @@ static void alive_fn(void)
 	}
 	else
 	{
-		var = 16000;
+		var = 2000;
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
 }
@@ -634,7 +639,7 @@ static void exo_prepare(st_exoesk * exoesk, uint16_t position)
 	}
 
 #else
-	uint8_t counter = 0;
+	uint8_t fingers_prep = 0;
 	uint8_t finger = thumb;
 	for(finger=thumb; finger<flength; finger++)
 	{
@@ -653,11 +658,11 @@ static void exo_prepare(st_exoesk * exoesk, uint16_t position)
 					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
 				motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 				exoesk->go_to[finger] = position;
-				counter++;
+				fingers_prep++;
 			}
 		}
 	}
-	if(counter > 0)
+	if(fingers_prep > 0)
 	{
 		exoesk->in_operation = Yes;
 	}
@@ -668,7 +673,7 @@ static void exo_prepare(st_exoesk * exoesk, uint16_t position)
 static void exo_init(st_exoesk * exoesk)
 {
 	// Get which fingers are touching home sensor
-	uint8_t counter = 0;
+	uint8_t fingers_touching_home = 0;
 #ifdef test
 	if(is_finger_up(exoconfig[finger_under_test].home.pin))
 	{
@@ -677,7 +682,7 @@ static void exo_init(st_exoesk * exoesk)
 		exoesk->absolute_pos[finger_under_test] = HOME_POSITION;
 		set_direction(exoconfig[finger_under_test].direction.port, exoconfig[finger_under_test].direction.pin, Down);
 		motor_wakeup(exoconfig[finger_under_test].sleep.port, exoconfig[finger_under_test].sleep.pin);
-		counter++;
+		fingers_touching_home++;
 	}
 	else
 	{
@@ -696,7 +701,7 @@ static void exo_init(st_exoesk * exoesk)
 			exoesk->absolute_pos[finger] = HOME_POSITION;
 			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
 			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-			counter++;
+			fingers_touching_home++;
 		}
 		else
 		{
@@ -706,7 +711,7 @@ static void exo_init(st_exoesk * exoesk)
 		}
 	}
 #endif
-	if(counter>0)
+	if(fingers_touching_home > 0)
 		exoesk->in_operation = Yes;
 }
 

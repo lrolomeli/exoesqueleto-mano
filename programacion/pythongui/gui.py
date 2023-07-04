@@ -88,13 +88,11 @@ class Exoesqueleto(QMainWindow):
     def move_up(self):
         print("up")
         self.ser.write(bytes.fromhex("03"))
-        #time.sleep(1)
         print(self.ser)
     
     def move_down(self):
         print("down")
         self.ser.write(bytes.fromhex("02"))
-        #time.sleep(1)
         print(self.ser)
 
     def home(self):
