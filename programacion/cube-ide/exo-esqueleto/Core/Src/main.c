@@ -122,7 +122,7 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-//#define test
+#define test
 
 /* USER CODE END PD */
 
@@ -515,9 +515,13 @@ static void finger_motion(st_exoesk * exoesk)
 static void send_step_pulses(st_exoesk * exoesk)
 {
 	uint8_t fingers_ready = 0;
+#ifndef test
 	uint8_t fingers_in_op = 0;
-
+#endif
 #ifdef test
+
+
+
 	// case finger is active
 	if(exoesk->fingers_in_op[finger_under_test])
 	{
