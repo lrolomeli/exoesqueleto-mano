@@ -67,7 +67,12 @@ typedef enum{
 	select_middle = 0x7C,
 	select_ring = 0x7D,
 	select_little = 0x7E,
-	stopped = 0x7F
+	stopped = 0x7F,
+	speed_1 = 0xFB,
+	speed_2 = 0xFC,
+	speed_3 = 0xFD,
+	speed_4 = 0xFE,
+	speed_5 = 0xFF
 }enum_action;
 
 typedef enum{
@@ -399,6 +404,10 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
+void setSpeed(uint8_t speed){
+	htim3.Init.Period = 5*speed;
+}
+
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
 {
 	if(*pos_flag)
@@ -428,6 +437,32 @@ static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action a
 			{
 				exoesk->fingers_in_op[finger] = No;
 			}
+		}
+		else if(act >= speed_1 && act <= speed_5)
+		{
+			uint8_t speed = 1;
+
+			switch(speed)
+			{
+			case speed_1:
+				speed = 1;
+				break;
+			case speed_2:
+				speed = 2;
+				break;
+			case speed_3:
+				speed = 3;
+				break;
+			case speed_4:
+				speed = 4;
+				break;
+			case speed_5:
+				speed = 5;
+				break;
+			default:
+				break;
+			}
+			setSpeed(speed);
 		}
 		else
 		{
