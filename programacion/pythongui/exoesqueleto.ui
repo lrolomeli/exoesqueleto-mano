@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>724</width>
+    <width>791</width>
     <height>592</height>
    </rect>
   </property>
@@ -17,14 +17,14 @@
    <widget class="QPushButton" name="mvdwn_bt">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>20</y>
-      <width>181</width>
-      <height>111</height>
+      <x>330</x>
+      <y>140</y>
+      <width>61</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>Mover Abajo</string>
+     <string/>
     </property>
     <property name="icon">
      <iconset>
@@ -40,14 +40,14 @@
    <widget class="QPushButton" name="mvup_bt">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>140</y>
-      <width>181</width>
-      <height>111</height>
+      <x>330</x>
+      <y>80</y>
+      <width>61</width>
+      <height>51</height>
      </rect>
     </property>
     <property name="text">
-     <string>Mover Arriba</string>
+     <string/>
     </property>
     <property name="icon">
      <iconset>
@@ -63,7 +63,7 @@
    <widget class="QPushButton" name="thumb_bt">
     <property name="geometry">
      <rect>
-      <x>220</x>
+      <x>330</x>
       <y>20</y>
       <width>81</width>
       <height>41</height>
@@ -82,7 +82,7 @@
    <widget class="QPushButton" name="indx_bt">
     <property name="geometry">
      <rect>
-      <x>320</x>
+      <x>420</x>
       <y>20</y>
       <width>81</width>
       <height>41</height>
@@ -102,13 +102,13 @@
     <property name="geometry">
      <rect>
       <x>20</x>
-      <y>270</y>
-      <width>181</width>
-      <height>111</height>
+      <y>10</y>
+      <width>81</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Referencia</string>
+     <string/>
     </property>
     <property name="icon">
      <iconset>
@@ -124,14 +124,14 @@
    <widget class="QPushButton" name="bluetooth_bt">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>450</y>
-      <width>201</width>
-      <height>91</height>
+      <x>110</x>
+      <y>10</y>
+      <width>131</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="text">
-     <string>Conectar Exo-Esqueleto</string>
+     <string>Conectar</string>
     </property>
     <property name="icon">
      <iconset>
@@ -147,7 +147,7 @@
    <widget class="QPushButton" name="middle_bt">
     <property name="geometry">
      <rect>
-      <x>420</x>
+      <x>510</x>
       <y>20</y>
       <width>81</width>
       <height>41</height>
@@ -166,7 +166,7 @@
    <widget class="QPushButton" name="ring_bt">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>600</x>
       <y>20</y>
       <width>81</width>
       <height>41</height>
@@ -185,7 +185,7 @@
    <widget class="QPushButton" name="little_bt">
     <property name="geometry">
      <rect>
-      <x>620</x>
+      <x>690</x>
       <y>20</y>
       <width>81</width>
       <height>41</height>
@@ -204,8 +204,8 @@
    <widget class="QLabel" name="label_hand">
     <property name="geometry">
      <rect>
-      <x>300</x>
-      <y>150</y>
+      <x>450</x>
+      <y>140</y>
       <width>301</width>
       <height>401</height>
      </rect>
@@ -223,8 +223,8 @@
    <widget class="QLabel" name="label_thumb">
     <property name="geometry">
      <rect>
-      <x>290</x>
-      <y>180</y>
+      <x>440</x>
+      <y>160</y>
       <width>31</width>
       <height>51</height>
      </rect>
@@ -242,8 +242,8 @@
    <widget class="QLabel" name="label_index">
     <property name="geometry">
      <rect>
-      <x>440</x>
-      <y>90</y>
+      <x>590</x>
+      <y>80</y>
       <width>31</width>
       <height>51</height>
      </rect>
@@ -261,8 +261,8 @@
    <widget class="QLabel" name="label_middle">
     <property name="geometry">
      <rect>
-      <x>520</x>
-      <y>110</y>
+      <x>660</x>
+      <y>90</y>
       <width>31</width>
       <height>51</height>
      </rect>
@@ -280,8 +280,8 @@
    <widget class="QLabel" name="label_ring">
     <property name="geometry">
      <rect>
-      <x>560</x>
-      <y>140</y>
+      <x>710</x>
+      <y>120</y>
       <width>31</width>
       <height>51</height>
      </rect>
@@ -299,8 +299,8 @@
    <widget class="QLabel" name="label_little">
     <property name="geometry">
      <rect>
-      <x>590</x>
-      <y>200</y>
+      <x>740</x>
+      <y>180</y>
       <width>31</width>
       <height>51</height>
      </rect>
@@ -315,13 +315,134 @@
      <bool>true</bool>
     </property>
    </widget>
+   <widget class="QSlider" name="speed_slider">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>400</y>
+      <width>211</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>5</number>
+    </property>
+    <property name="pageStep">
+     <number>1</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>470</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Velocidad:</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="speed_label">
+    <property name="geometry">
+     <rect>
+      <x>170</x>
+      <y>470</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>Muy Baja</string>
+    </property>
+   </widget>
+   <widget class="QSlider" name="angle_slider">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>200</y>
+      <width>211</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>0</number>
+    </property>
+    <property name="maximum">
+     <number>120</number>
+    </property>
+    <property name="pageStep">
+     <number>10</number>
+    </property>
+    <property name="sliderPosition">
+     <number>70</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>280</y>
+      <width>121</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Angulo</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="angle_label">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>280</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>70°</string>
+    </property>
+   </widget>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>724</width>
+     <width>791</width>
      <height>22</height>
     </rect>
    </property>

@@ -401,9 +401,11 @@ void SystemClock_Config(void)
 
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
 {
-	if(*pos_flag)
+	//al inicio la bandera de posicion es 0
+	if(*pos_flag>0)
 	{
-		gotopos_fn(exoesk, (act-1)<<Sixteen_Step);
+		steps = act * 25;
+		gotopos_fn(exoesk, steps);
 		*pos_flag = 0;
 	}
 	else
@@ -619,6 +621,12 @@ static void go_up_fn(st_exoesk * exoesk)
 {
 	exo_prepare(exoesk, HOME_POSITION);
 }
+
+static void gotopos_fn(st_exoesk * exoesk, uint16_t position)
+{
+	exo_prepare(exoesk, position);
+}
+
 static void sinewave_fn(st_exoesk * exoesk)
 {
 
@@ -717,10 +725,6 @@ static void exo_init(st_exoesk * exoesk)
 #endif
 	if(fingers_touching_home > 0)
 		exoesk->in_operation = Yes;
-}
-
-static void gotopos_fn(st_exoesk * exoesk, uint16_t position)
-{
 }
 
 static void clean_buffer(uint8_t * buf)

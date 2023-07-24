@@ -11,6 +11,7 @@ class Exoesqueleto(QMainWindow):
     def __init__(self):
         super().__init__()
         self.ser = None
+        self.speedLabel = ["Muy Baja","Baja","Intermedia","Alta","Muy Alta"]
         self.thumb_v = False
         self.index_v = False
         self.middle_v = False
@@ -32,6 +33,18 @@ class Exoesqueleto(QMainWindow):
         self.ui.middle_bt.clicked.connect(self.middle)
         self.ui.ring_bt.clicked.connect(self.ring)
         self.ui.little_bt.clicked.connect(self.little)
+        self.ui.speed_slider.valueChanged.connect(self.speed)
+        self.ui.angle_slider.valueChanged.connect(self.gotopos)
+        self.speedcmd=["FF","FF","FF","FF","FF"]
+
+    def gotopos(self, value):
+        self.ui.angle_label.setText(str(value)+'°')
+        #self.ser.write(bytes.fromhex("05"))
+        #self.ser.write(bytes.fromhex(hex(value)))
+
+    def speed(self, value):
+        self.ui.speed_label.setText(self.speedLabel[value-1])
+        #self.ser.write(bytes.fromhex(self.speedcmd[value-1]))
 
     def closeEvent(self, event):
         if self.ser is not None:
