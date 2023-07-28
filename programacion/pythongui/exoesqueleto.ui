@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>791</width>
+    <width>846</width>
     <height>592</height>
    </rect>
   </property>
@@ -319,7 +319,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>400</y>
+      <y>280</y>
       <width>211</width>
       <height>51</height>
      </rect>
@@ -341,7 +341,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>470</y>
+      <y>350</y>
       <width>121</width>
       <height>41</height>
      </rect>
@@ -359,7 +359,7 @@
     <property name="geometry">
      <rect>
       <x>170</x>
-      <y>470</y>
+      <y>350</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -377,8 +377,8 @@
    <widget class="QSlider" name="angle_slider">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>200</y>
+      <x>10</x>
+      <y>120</y>
       <width>211</width>
       <height>51</height>
      </rect>
@@ -402,8 +402,8 @@
    <widget class="QLabel" name="label_3">
     <property name="geometry">
      <rect>
-      <x>20</x>
-      <y>280</y>
+      <x>10</x>
+      <y>170</y>
       <width>121</width>
       <height>41</height>
      </rect>
@@ -420,8 +420,8 @@
    <widget class="QLabel" name="angle_label">
     <property name="geometry">
      <rect>
-      <x>130</x>
-      <y>280</y>
+      <x>110</x>
+      <y>180</y>
       <width>201</width>
       <height>31</height>
      </rect>
@@ -436,13 +436,135 @@
      <string>70°</string>
     </property>
    </widget>
+   <widget class="QSlider" name="Reps_Slider">
+    <property name="geometry">
+     <rect>
+      <x>30</x>
+      <y>410</y>
+      <width>231</width>
+      <height>51</height>
+     </rect>
+    </property>
+    <property name="minimum">
+     <number>1</number>
+    </property>
+    <property name="maximum">
+     <number>10</number>
+    </property>
+    <property name="pageStep">
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>1</number>
+    </property>
+    <property name="orientation">
+     <enum>Qt::Horizontal</enum>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_2">
+    <property name="geometry">
+     <rect>
+      <x>20</x>
+      <y>480</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>20</pointsize>
+     </font>
+    </property>
+    <property name="text">
+     <string>Repeticiones</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Reps_label_2">
+    <property name="geometry">
+     <rect>
+      <x>180</x>
+      <y>490</y>
+      <width>201</width>
+      <height>31</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <pointsize>16</pointsize>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>1</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="Neutral_Label">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>150</y>
+      <width>181</width>
+      <height>71</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="pixmap">
+     <pixmap>../../../../../Pictures/mano_interfaz_2.png</pixmap>
+    </property>
+   </widget>
+   <widget class="QLabel" name="PN_label">
+    <property name="geometry">
+     <rect>
+      <x>210</x>
+      <y>170</y>
+      <width>101</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="font">
+     <font>
+      <bold>true</bold>
+     </font>
+    </property>
+    <property name="text">
+     <string>posicion Neutral</string>
+    </property>
+   </widget>
+   <zorder>Neutral_Label</zorder>
+   <zorder>mvdwn_bt</zorder>
+   <zorder>mvup_bt</zorder>
+   <zorder>thumb_bt</zorder>
+   <zorder>indx_bt</zorder>
+   <zorder>home_bt</zorder>
+   <zorder>bluetooth_bt</zorder>
+   <zorder>middle_bt</zorder>
+   <zorder>ring_bt</zorder>
+   <zorder>little_bt</zorder>
+   <zorder>label_hand</zorder>
+   <zorder>label_thumb</zorder>
+   <zorder>label_index</zorder>
+   <zorder>label_middle</zorder>
+   <zorder>label_ring</zorder>
+   <zorder>label_little</zorder>
+   <zorder>speed_slider</zorder>
+   <zorder>label</zorder>
+   <zorder>speed_label</zorder>
+   <zorder>angle_slider</zorder>
+   <zorder>label_3</zorder>
+   <zorder>angle_label</zorder>
+   <zorder>Reps_Slider</zorder>
+   <zorder>label_2</zorder>
+   <zorder>Reps_label_2</zorder>
+   <zorder>PN_label</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>791</width>
+     <width>846</width>
      <height>22</height>
     </rect>
    </property>

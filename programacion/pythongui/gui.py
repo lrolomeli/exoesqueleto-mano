@@ -35,10 +35,15 @@ class Exoesqueleto(QMainWindow):
         self.ui.little_bt.clicked.connect(self.little)
         self.ui.speed_slider.valueChanged.connect(self.speed)
         self.ui.angle_slider.valueChanged.connect(self.gotopos)
-        self.speedcmd=["FF","FF","FF","FF","FF"]
+        self.ui.Reps_Slider.valueChanged.connect(self.Reps)
+        self.speedcmd=["FB","FC","FD","FE","FF"]
+
+    def Reps(self, value):   
+     self.ui.Reps_label_2.setText(str(value))
+
 
     def gotopos(self, value):
-        self.ui.angle_label.setText(str(value)+'°')
+        self.ui.angle_label.setText(str(value))
         #self.ser.write(bytes.fromhex("05"))
         #self.ser.write(bytes.fromhex(hex(value)))
 
