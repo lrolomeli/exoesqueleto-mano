@@ -410,6 +410,9 @@ void setSpeed(uint8_t speed){
 
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
 {
+	uint8_t speed = 1;
+	uint16_t steps = 0;
+
 	//al inicio la bandera de posicion es 0
 	if(*pos_flag>0)
 	{
@@ -442,9 +445,7 @@ static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action a
 		}
 		else if(act >= speed_1 && act <= speed_5)
 		{
-			uint8_t speed = 1;
-
-			switch(speed)
+			switch(act)
 			{
 			case speed_1:
 				speed = 1;
