@@ -127,7 +127,7 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-#define test
+//#define test
 
 /* USER CODE END PD */
 
@@ -316,6 +316,7 @@ int main(void)
 	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 	htim3.Init.Period = htim3.Init.Period >> (normal);
 	HAL_TIM_Base_Start_IT(&htim3);
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
 	exo_init(&exoesk);
 
   /* USER CODE END 2 */
@@ -410,6 +411,7 @@ void setSpeed(uint8_t speed){
 
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
 {
+	uint16_t steps=0;
 	//al inicio la bandera de posicion es 0
 	if(*pos_flag>0)
 	{
@@ -444,7 +446,7 @@ static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action a
 		{
 			uint8_t speed = 1;
 
-			switch(speed)
+			switch(act)
 			{
 			case speed_1:
 				speed = 1;

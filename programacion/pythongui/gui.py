@@ -49,7 +49,7 @@ class Exoesqueleto(QMainWindow):
 
     def speed(self, value):
         self.ui.speed_label.setText(self.speedLabel[value-1])
-        #self.ser.write(bytes.fromhex(self.speedcmd[value-1]))
+        self.ser.write(bytes.fromhex(self.speedcmd[value-1]))
 
     def closeEvent(self, event):
         if self.ser is not None:
@@ -109,6 +109,11 @@ class Exoesqueleto(QMainWindow):
         print(self.ser)
     
     def move_down(self):
+        print("down")
+        self.ser.write(bytes.fromhex("02"))
+        print(self.ser)
+
+    def ciclos(self):
         for i in range(10):
             #print("down")
             self.ser.write(bytes.fromhex("02"))
