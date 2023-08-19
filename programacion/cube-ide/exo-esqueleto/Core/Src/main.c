@@ -46,6 +46,12 @@ typedef enum{
 }enum_in_operation;
 
 typedef enum{
+	Unreferenced = 0,
+	Referenced
+}enum_referenced;
+
+
+typedef enum{
 	not_used = 0x00,
 	reference_routine = 0x01,
 	all_way_down  = 0x02,
@@ -79,7 +85,7 @@ typedef enum{
 	lost = 0,
 	home,
 	referenced
-}enum_motor_stat;
+}enum_motor_status;
 
 typedef enum{
 	thumb = 0,
@@ -154,7 +160,7 @@ static enum_fingers finger_under_test = ring;
 #endif
 
 static volatile uint8_t timeout_flg = 0;
-static volatile enum_motor_stat home_routine[flength] = {lost};
+static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
 //static const enum_stepping stepping = sixteen_step;
 
@@ -164,7 +170,7 @@ static volatile enum_buffer_status buffer_status = empty;
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
-static uint8_t is_finger_up(uint16_t finger_home_sensor);
+//static uint8_t is_finger_up(uint16_t finger_home_sensor);
 static void send_pulse(enum_ports port, uint16_t pin);
 static void motor_wakeup(enum_ports port, uint16_t pin);
 static void sleep_motor(enum_ports port, uint16_t pin);
@@ -179,10 +185,11 @@ static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
 static void finger_motion(st_exoesk * exoesk);
 static void toggle_finger(st_exoesk * exoesk, enum_action act);
-static void exo_init(st_exoesk * exoesk);
+static void go_first_down(st_exoesk * exoesk);
 static uint8_t is_system_referenced(void);
 static void send_home(st_exoesk * exoesk);
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act);
+static void dynamics(st_exoesk * exoesk, uint8_t * exo_rdy_to_op, uint8_t * home_send);
 
 /* USER CODE END PFP */
 
@@ -285,7 +292,7 @@ int main(void)
 {
   /* USER CODE BEGIN 1 */
 	st_exoesk exoesk = {{0}, {0}, {0}, No};
-	uint8_t referenced_system = No;
+	uint8_t exo_rdy_to_op = No;
 	uint8_t buffer = 0;
 	uint8_t position_flag = 0;
 	uint8_t home_send = No;
@@ -317,7 +324,7 @@ int main(void)
 	htim3.Init.Period = htim3.Init.Period >> (normal);
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-	exo_init(&exoesk);
+	go_first_down(&exoesk);
 
   /* USER CODE END 2 */
 
@@ -325,37 +332,21 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		if(full == buffer_status && Yes == referenced_system)
+		if(full == buffer_status && Yes == exo_rdy_to_op)
 		{
 			prepare_action(&exoesk, &position_flag, buffer);
 			clean_buffer(&buffer);
 			HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
 		}
 
-		if (No == referenced_system)
+		if (No == exo_rdy_to_op)
 		{
-			referenced_system = is_system_referenced();
+			exo_rdy_to_op = is_system_referenced();
 		}
-
 
 		if(timeout_flg)
 		{
-			if(exoesk.in_operation)
-			{
-				finger_motion(&exoesk);
-			}
-			else if(No == referenced_system && No == home_send)
-			{
-				// Si llegamos hasta aqui ya no debe haber ningun
-				// dedo presionando ningun boton.
-				send_home(&exoesk);
-				home_send = Yes;
-			}
-			else
-			{
-				exoesk.in_operation = No;
-			}
-
+			dynamics(&exoesk, &exo_rdy_to_op, &home_send);
 			alive_fn();
 			timeout_flg = 0;
 		}
@@ -407,6 +398,31 @@ void SystemClock_Config(void)
 
 void setSpeed(uint8_t speed){
 	htim3.Init.Period = 5*speed;
+}
+
+static void dynamics(st_exoesk * exoesk, uint8_t * exo_rdy_to_op, uint8_t * home_send)
+{
+	if(exoesk->in_operation)
+	{
+		/* Move fingers */
+		finger_motion(exoesk);
+	}
+	/* It is not intuitive but this means home routine can start
+	 *
+	 * Program begins with exoesk in operation which means
+	 * fingers are initially moving downwards and only when they stop
+	 * fingers will be down and home motion can begin
+	 */
+	else if(No == *exo_rdy_to_op && No == *home_send)
+	{
+		/* No key button is pressed at this point */
+		send_home(exoesk);
+		*home_send = Yes;
+	}
+	else
+	{
+		exoesk->in_operation = No;
+	}
 }
 
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
@@ -518,29 +534,24 @@ static void toggle_finger(st_exoesk * exoesk, enum_action act)
 static uint8_t is_system_referenced(void)
 {
 #ifdef test
-
 		if(home_routine[finger_under_test] == referenced)
 		{
 			return Yes;
 		}
-
 #else
-	uint8_t finger=0;
-	uint8_t fingers_ref = 0;
-	for(finger=0; finger<flength; finger++)
-	{
-		if(home_routine[finger] == referenced)
-		{
-			fingers_ref++;
-		}
-	}
-	if(fingers_ref == flength)
+	if(home_routine[thumb] == referenced &&
+		home_routine[index] == referenced &&
+		home_routine[middle] == referenced &&
+		home_routine[ring] == referenced &&
+		home_routine[little] == referenced)
 	{
 		return Yes;
 	}
-
 #endif
-	return 0;
+	else
+	{
+		return No;
+	}
 }
 
 static void finger_motion(st_exoesk * exoesk)
@@ -719,49 +730,18 @@ static void exo_prepare(st_exoesk * exoesk, uint16_t position)
 
 }
 
-static void exo_init(st_exoesk * exoesk)
+static void go_first_down(st_exoesk * exoesk)
 {
-	// Get which fingers are touching home sensor
-	uint8_t fingers_touching_home = 0;
-#ifdef test
-	if(is_finger_up(exoconfig[finger_under_test].home.pin))
-	{
-		exoesk->fingers_in_op[finger_under_test] = Yes;
-		exoesk->go_to[finger_under_test] = Home_Steps;
-		exoesk->absolute_pos[finger_under_test] = HOME_POSITION;
-		set_direction(exoconfig[finger_under_test].direction.port, exoconfig[finger_under_test].direction.pin, Down);
-		motor_wakeup(exoconfig[finger_under_test].sleep.port, exoconfig[finger_under_test].sleep.pin);
-		fingers_touching_home++;
-	}
-	else
-	{
-		exoesk->fingers_in_op[finger_under_test] = No;
-		exoesk->go_to[finger_under_test] = HOME_POSITION;
-		exoesk->absolute_pos[finger_under_test] = UNKNOWN;
-	}
-
-#else
 	for(uint8_t finger=thumb; finger<flength; finger++)
 	{
-		if(is_finger_up(exoconfig[finger].home.pin))
-		{
-			exoesk->fingers_in_op[finger] = Yes;
-			exoesk->go_to[finger] = Home_Steps;
-			exoesk->absolute_pos[finger] = HOME_POSITION;
-			set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
-			motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-			fingers_touching_home++;
-		}
-		else
-		{
-			exoesk->fingers_in_op[finger] = No;
-			exoesk->go_to[finger] = HOME_POSITION;
-			exoesk->absolute_pos[finger] = UNKNOWN;
-		}
+		exoesk->fingers_in_op[finger] = Yes;
+		exoesk->go_to[finger] = Home_Steps;
+		exoesk->absolute_pos[finger] = HOME_POSITION;
+		set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
+		motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 	}
-#endif
-	if(fingers_touching_home > 0)
-		exoesk->in_operation = Yes;
+
+	exoesk->in_operation = Yes;
 }
 
 static void clean_buffer(uint8_t * buf)
@@ -796,10 +776,10 @@ static void send_pulse(enum_ports port, uint16_t pin)
 }
 
 
-static uint8_t is_finger_up(uint16_t finger_home_sensor)
-{
-	return HAL_GPIO_ReadPin(GPIOB, finger_home_sensor);
-}
+//static uint8_t is_finger_up(uint16_t finger_home_sensor)
+//{
+//	return HAL_GPIO_ReadPin(GPIOB, finger_home_sensor);
+//}
 
 static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir)
 {
