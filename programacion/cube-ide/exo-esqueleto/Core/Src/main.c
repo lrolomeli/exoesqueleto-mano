@@ -150,12 +150,13 @@ static const st_fconfig exoconfig[flength] = {
 };
 
 #ifdef test
-static enum_fingers finger_under_test = ring;
+static enum_fingers finger_under_test = index;
 #endif
 
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_stat home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
+static uint8_t veces = 0;
 //static const enum_stepping stepping = sixteen_step;
 
 /* USER CODE END PV */
@@ -268,11 +269,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 {
 	if(htim->Instance == TIM3)
 	{
-		if(~timeout_flg)
+		if(timeout_flg==0)
 		{
 			timeout_flg = 1;
 		}
+
 	}
+
 }
 
 /* USER CODE END 0 */
@@ -289,6 +292,7 @@ int main(void)
 	uint8_t buffer = 0;
 	uint8_t position_flag = 0;
 	uint8_t home_send = No;
+	uint8_t entramos=0;
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -340,24 +344,35 @@ int main(void)
 
 		if(timeout_flg)
 		{
-			if(exoesk.in_operation)
+			// cada vez que entramos aqui ha pasado 1/2 ms
+			if (entramos<veces) //entramos = 0(1/2ms), 1(1ms),2(1.5),3(2),4(2.5),5(3),6(3.5),7(4),8(4.5),9(5),10(5.5)
 			{
-				finger_motion(&exoesk);
+				entramos++;
 			}
-			else if(No == referenced_system && No == home_send)
-			{
-				// Si llegamos hasta aqui ya no debe haber ningun
-				// dedo presionando ningun boton.
-				send_home(&exoesk);
-				home_send = Yes;
-			}
-			else
-			{
-				exoesk.in_operation = No;
+
+			else {
+				if(exoesk.in_operation)
+				{
+					finger_motion(&exoesk);
+				}
+				else if(No == referenced_system && No == home_send)
+				{
+					// Si llegamos hasta aqui ya no debe haber ningun
+					// dedo presionando ningun boton.
+					send_home(&exoesk);
+					home_send = Yes;
+				}
+				else
+				{
+					exoesk.in_operation = No;
+				}
+
+				entramos = 0;
 			}
 
 			alive_fn();
 			timeout_flg = 0;
+
 		}
 
     /* USER CODE END WHILE */
@@ -406,7 +421,9 @@ void SystemClock_Config(void)
 /* USER CODE BEGIN 4 */
 
 void setSpeed(uint8_t speed){
-	htim3.Init.Period = 5*speed;
+	// 5 entramos a 5 = 2.5 ms
+	// 12345
+	veces = speed;
 }
 
 static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
@@ -433,8 +450,14 @@ static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action a
 			*pos_flag = 1;
 		}
 		else if(act > nothing && act < stopped)
+
 		{
+
 			toggle_finger(exoesk, act);
+		}
+		else if (act==stopped){
+
+			exoesk->in_operation = No;
 		}
 		else if(act == reserved_major_C)
 		{
