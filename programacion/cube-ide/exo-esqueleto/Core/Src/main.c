@@ -74,6 +74,7 @@ typedef enum{
 	select_ring = 0x7D,
 	select_little = 0x7E,
 	stopped = 0x7F,
+	speed_0 = 0xFA,
 	speed_1 = 0xFB,
 	speed_2 = 0xFC,
 	speed_3 = 0xFD,
@@ -108,11 +109,19 @@ typedef enum{
 
 }enum_speed;
 
+typedef enum{
+	home_fs = 0,
+	idle_fs,
+
+}enum_fsm_state;
+
 typedef struct{
+	enum_in_operation in_operation;
+	enum_fsm_state fsm_state;
 	uint16_t absolute_pos[flength];
 	uint16_t go_to[flength];
 	uint8_t fingers_in_op[flength];
-	enum_in_operation in_operation;
+	uint8_t bluetooth_command;
 }st_exoesk;
 
 typedef struct{
@@ -184,18 +193,23 @@ static void exo_prepare(st_exoesk * exoesk, uint16_t position);
 static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
 static void finger_motion(st_exoesk * exoesk);
-static void toggle_finger(st_exoesk * exoesk, enum_action act);
-static void go_first_down(st_exoesk * exoesk);
+static void toggle_finger(st_exoesk * exoesk);
 static uint8_t is_system_referenced(void);
 static void send_home(st_exoesk * exoesk);
-static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act);
-static void dynamics(st_exoesk * exoesk, uint8_t * exo_rdy_to_op, uint8_t * home_send);
+static void select_all_fingers(st_exoesk * exoesk);
+static void deselect_all_fingers(st_exoesk * exoesk);
+static void prepare_action(st_exoesk * exoesk);
+static void dynamics(st_exoesk * exoesk);
+static void home_f(st_exoesk * exoesk);
+static void idle_f(st_exoesk * exoesk);
+static uint8_t process_cmd(st_exoesk * exoesk);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
 func_ptr_t exo_preactions[4] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn};
+func_ptr_t fsm_state[2] = {home_f, idle_f};
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -291,11 +305,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	st_exoesk exoesk = {{0}, {0}, {0}, No};
-	uint8_t exo_rdy_to_op = No;
-	uint8_t buffer = 0;
-	uint8_t position_flag = 0;
-	uint8_t home_send = No;
+	st_exoesk exoesk = {No, home_fs, {0}, {0}, {0}, 0};
+
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -320,11 +331,10 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
 
-	HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
+	HAL_UART_Receive_IT(&huart3, &exoesk.bluetooth_command, sizeof(exoesk.bluetooth_command));
 	htim3.Init.Period = htim3.Init.Period >> (normal);
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-	go_first_down(&exoesk);
 
   /* USER CODE END 2 */
 
@@ -332,25 +342,15 @@ int main(void)
   /* USER CODE BEGIN WHILE */
 	while (1)
 	{
-		if(full == buffer_status && Yes == exo_rdy_to_op)
-		{
-			prepare_action(&exoesk, &position_flag, buffer);
-			clean_buffer(&buffer);
-			HAL_UART_Receive_IT(&huart3, &buffer, sizeof(buffer));
-		}
 
-		if (No == exo_rdy_to_op)
-		{
-			exo_rdy_to_op = is_system_referenced();
-		}
+		fsm_state[exoesk.fsm_state](&exoesk);
 
 		if(timeout_flg)
 		{
-			dynamics(&exoesk, &exo_rdy_to_op, &home_send);
+			dynamics(&exoesk);
 			alive_fn();
 			timeout_flg = 0;
 		}
-
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
@@ -396,105 +396,159 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-void setSpeed(uint8_t speed){
-	htim3.Init.Period = 5*speed;
+
+static void select_all_fingers(st_exoesk * exoesk)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		exoesk->fingers_in_op[finger] = Yes;
+	}
 }
 
-static void dynamics(st_exoesk * exoesk, uint8_t * exo_rdy_to_op, uint8_t * home_send)
+static void deselect_all_fingers(st_exoesk * exoesk)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		exoesk->fingers_in_op[finger] = No;
+	}
+}
+
+static void dynamics(st_exoesk * exoesk)
 {
 	if(exoesk->in_operation)
 	{
 		/* Move fingers */
 		finger_motion(exoesk);
 	}
-	/* It is not intuitive but this means home routine can start
-	 *
-	 * Program begins with exoesk in operation which means
-	 * fingers are initially moving downwards and only when they stop
-	 * fingers will be down and home motion can begin
-	 */
-	else if(No == *exo_rdy_to_op && No == *home_send)
-	{
-		/* No key button is pressed at this point */
-		send_home(exoesk);
-		*home_send = Yes;
-	}
-	else
-	{
-		exoesk->in_operation = No;
-	}
+
 }
 
-static void prepare_action(st_exoesk * exoesk, uint8_t * pos_flag, enum_action act)
+static void home_f(st_exoesk * exoesk)
 {
-	uint8_t speed = 1;
-	uint16_t steps = 0;
+	static uint8_t home_state = 0;
+	static uint8_t prev_state = 0;
 
-	//al inicio la bandera de posicion es 0
-	if(*pos_flag>0)
-	{
-		steps = act * 25;
-		gotopos_fn(exoesk, steps);
-		*pos_flag = 0;
-	}
-	else
-	{
-		if(act > not_used && act < gotoposition)
+	switch(home_state){
+	case 0:
+		// go down
+		select_all_fingers(exoesk);
+		gotopos_fn(exoesk, Home_Steps);
+		home_state = 4; // idle
+		break;
+	case 1:
+		// go home
+		select_all_fingers(exoesk);
+		send_home(exoesk);
+		home_state = 4; // idle
+		break;
+	case 2:
+		// go to position
+		if(is_system_referenced())
 		{
-			exo_preactions[act-1](exoesk);
-		}
-		else if(act == gotoposition)
-		{
-			// set flag for entering position
-			*pos_flag = 1;
-		}
-		else if(act > nothing && act < stopped)
-		{
-			toggle_finger(exoesk, act);
-		}
-		else if(act == reserved_major_C)
-		{
-			uint8_t finger=0;
-			for(finger=0; finger<flength; finger++)
-			{
-				exoesk->fingers_in_op[finger] = No;
-			}
-		}
-		else if(act >= speed_1 && act <= speed_5)
-		{
-			switch(act)
-			{
-			case speed_1:
-				speed = 1;
-				break;
-			case speed_2:
-				speed = 2;
-				break;
-			case speed_3:
-				speed = 3;
-				break;
-			case speed_4:
-				speed = 4;
-				break;
-			case speed_5:
-				speed = 5;
-				break;
-			default:
-				break;
-			}
-			setSpeed(speed);
+			select_all_fingers(exoesk);
+			gotopos_fn(exoesk, Home_Steps);
+			home_state = 4; // idle
 		}
 		else
 		{
-
+			home_state = 2;
 		}
+		break;
+	case 3:
+		deselect_all_fingers(exoesk);
+		exoesk->fsm_state = idle_fs;
+		break;
+	case 4:
+		// home idle
+		if(No == exoesk->in_operation)
+		{
+			home_state = prev_state + 1;
+		}
+		break;
+	default:
+		break;
+	}
+
+}
+
+
+static void idle_f(st_exoesk * exoesk)
+{
+
+	if(full == buffer_status)
+	{
+		prepare_action(exoesk);
+		clean_buffer(&exoesk->bluetooth_command);
+		HAL_UART_Receive_IT(&huart3, &exoesk->bluetooth_command, sizeof(exoesk->bluetooth_command));
+	}
+
+}
+
+static void prepare_action(st_exoesk * exoesk)
+{
+	static uint8_t cmd_complete = 1;
+	uint16_t steps = 0;
+
+	if(cmd_complete == 0)
+	{
+		steps = exoesk->bluetooth_command * 25;
+		gotopos_fn(exoesk, steps);
+		cmd_complete = 1;
+	}
+	else
+	{
+		cmd_complete = process_cmd(exoesk);
 	}
 }
+
+
+static uint8_t process_cmd(st_exoesk * exoesk)
+{
+	switch(exoesk->bluetooth_command)
+	{
+	case not_used:
+		break;
+	case reference_routine:
+	case all_way_down:
+	case all_way_up:
+	case sinewave:
+		exo_preactions[exoesk->bluetooth_command-1](exoesk);
+		break;
+	case gotoposition:
+		return 0;
+		break;
+	case reserved_major_C:
+		break;
+	case deselect_thumb:
+	case deselect_index:
+	case deselect_middle:
+	case deselect_ring:
+	case deselect_little:
+	case select_thumb:
+	case select_index:
+	case select_middle:
+	case select_ring:
+	case select_little:
+		toggle_finger(exoesk);
+		break;
+	case speed_1:
+	case speed_2:
+	case speed_3:
+	case speed_4:
+	case speed_5:
+		//setSpeed(exoesk->bluetooth_command - speed_0);
+		break;
+	default:
+		break;
+	}
+	return 1;
+
+}
+
 
 static void send_home(st_exoesk * exoesk)
 {
 #ifdef test
-	exoesk->fingers_in_op[finger_under_test] = Yes;
 	set_direction(exoconfig[finger_under_test].direction.port, exoconfig[finger_under_test].direction.pin, Up);
 	motor_wakeup(exoconfig[finger_under_test].sleep.port, exoconfig[finger_under_test].sleep.pin);
 	exoesk->absolute_pos[finger_under_test] = UNKNOWN;
@@ -505,7 +559,6 @@ static void send_home(st_exoesk * exoesk)
 	uint8_t finger=0;
 	for(finger=0; finger<flength; finger++)
 	{
-		exoesk->fingers_in_op[finger] = Yes;
 		set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
 		motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 		exoesk->absolute_pos[finger] = UNKNOWN;
@@ -517,9 +570,9 @@ static void send_home(st_exoesk * exoesk)
 
 }
 
-static void toggle_finger(st_exoesk * exoesk, enum_action act)
+static void toggle_finger(st_exoesk * exoesk)
 {
-	uint8_t finger = (act - deselect_thumb);
+	uint8_t finger = (exoesk->bluetooth_command - deselect_thumb);
 
 	if(finger < flength){
 		exoesk->fingers_in_op[finger % flength] = No;
@@ -728,20 +781,6 @@ static void exo_prepare(st_exoesk * exoesk, uint16_t position)
 	}
 #endif
 
-}
-
-static void go_first_down(st_exoesk * exoesk)
-{
-	for(uint8_t finger=thumb; finger<flength; finger++)
-	{
-		exoesk->fingers_in_op[finger] = Yes;
-		exoesk->go_to[finger] = Home_Steps;
-		exoesk->absolute_pos[finger] = HOME_POSITION;
-		set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
-		motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-	}
-
-	exoesk->in_operation = Yes;
 }
 
 static void clean_buffer(uint8_t * buf)
