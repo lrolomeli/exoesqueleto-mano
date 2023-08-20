@@ -50,6 +50,14 @@ typedef enum{
 	Referenced
 }enum_referenced;
 
+typedef enum{
+	ReleaseHomeButtons = 0,
+	GoTowardsHomeButtons,
+	PlaceInStartPosition,
+	HomeRoutineComplete,
+	HomeIdleStage
+}enum_home_stages;
+
 
 typedef enum{
 	not_used = 0x00,
@@ -172,7 +180,7 @@ static uint8_t times = 0;
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
-static volatile st_gfinger_params gfinger_params = {{0},{0},{0}};
+static volatile st_gfinger_params gfinger_params = { {0},{0},{0},{0} };
 
 //static const enum_stepping stepping = sixteen_step;
 
@@ -188,30 +196,25 @@ static void motor_wakeup(enum_ports port, uint16_t pin);
 static void sleep_motor(enum_ports port, uint16_t pin);
 static void clean_buffer(uint8_t * buf);
 static void sinewave_fn(st_exoesk * exoesk);
-static void go_up_fn(st_exoesk * exoesk);
-static void go_down_fn(st_exoesk * exoesk);
 static void ref_routine_fn(st_exoesk * exoesk);
-static void gotopos_fn(st_exoesk * exoesk, uint16_t position);
-static void exo_prepare(st_exoesk * exoesk, uint16_t position);
+static void preset_fingers_target(st_exoesk * exoesk, uint16_t position);
 static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
-static void finger_motion(st_exoesk * exoesk);
 static void toggle_finger(uint8_t btcmd);
 static uint8_t is_system_referenced(void);
 static void send_home(st_exoesk * exoesk);
 static void select_all_fingers(st_exoesk * exoesk);
-static void deselect_all_fingers(st_exoesk * exoesk);
 static void prepare_action(st_exoesk * exoesk);
 static void dynamics(st_exoesk * exoesk);
 static void home_f(st_exoesk * exoesk);
 static void idle_f(st_exoesk * exoesk);
+static void finger_default_conditions();
 static uint8_t process_cmd(st_exoesk * exoesk);
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-func_ptr_t exo_preactions[4] = {ref_routine_fn, go_down_fn, go_up_fn, sinewave_fn};
 func_ptr_t fsm_state[2] = {home_f, idle_f};
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
@@ -305,7 +308,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
-	uint8_t entramos=0;
+	uint8_t halfms_cnt=0;
 	st_exoesk exoesk = {No, home_fs, 0};
   /* USER CODE END 1 */
 
@@ -347,15 +350,16 @@ int main(void)
 
 		if(timeout_flg)
 		{
-			// cada vez que entramos aqui ha pasado 1/2 ms
-			if (entramos<times) //entramos = 0(1/2ms), 1(1ms),2(1.5),3(2),4(2.5),5(3),6(3.5),7(4),8(4.5),9(5),10(5.5)
+
+			if (halfms_cnt < times)
 			{
-				entramos++;
+
+				halfms_cnt++;
 			}
 			else
 			{
 				dynamics(&exoesk);
-				entramos = 0;
+				halfms_cnt = 0;
 			}
 			alive_fn();
 			timeout_flg = 0;
@@ -405,6 +409,7 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
+
 static void select_all_fingers(st_exoesk * exoesk)
 {
 	for(uint8_t finger=thumb; finger<flength; finger++)
@@ -413,64 +418,58 @@ static void select_all_fingers(st_exoesk * exoesk)
 	}
 }
 
-static void deselect_all_fingers(st_exoesk * exoesk)
-{
-	for(uint8_t finger=thumb; finger<flength; finger++)
-	{
-		gfinger_params.fingers_in_op[finger] = No;
-	}
-}
-
 static void dynamics(st_exoesk * exoesk)
 {
 	if(exoesk->in_operation)
 	{
 		/* Move fingers */
-		finger_motion(exoesk);
+		send_step_pulses(exoesk);
 	}
 
 }
 
 static void home_f(st_exoesk * exoesk)
 {
-	static uint8_t home_state = 0;
-	static uint8_t prev_state = 0;
+	static enum_home_stages home_stage = ReleaseHomeButtons;
+	static enum_home_stages prev_stage = ReleaseHomeButtons;
 
-	switch(home_state){
-	case 0:
-		// go down
+	switch(home_stage)
+	{
+	case ReleaseHomeButtons:
+		finger_default_conditions();
 		select_all_fingers(exoesk);
-		gotopos_fn(exoesk, Home_Steps);
-		home_state = 4; // idle
+		/* Before this we have to reset preconditions */
+		preset_fingers_target(exoesk, Home_Steps);
+		home_stage = HomeIdleStage;
 		break;
-	case 1:
-		// go home
+	case GoTowardsHomeButtons:
 		select_all_fingers(exoesk);
 		send_home(exoesk);
-		home_state = 4; // idle
+		home_stage = HomeIdleStage;
 		break;
-	case 2:
-		// go to position
+	case PlaceInStartPosition:
 		if(is_system_referenced())
 		{
 			select_all_fingers(exoesk);
-			gotopos_fn(exoesk, Home_Steps);
-			home_state = 3; // idle
+			preset_fingers_target(exoesk, Default_Steps);
+			home_stage = HomeIdleStage;
 		}
 		else
 		{
-			home_state = 2;
+			home_stage = PlaceInStartPosition;
 		}
 		break;
-	case 3:
+	case HomeRoutineComplete:
 		exoesk->fsm_state = idle_fs;
+		home_stage = ReleaseHomeButtons;
+		prev_stage = ReleaseHomeButtons;
 		break;
-	case 4:
+	case HomeIdleStage:
 		// home idle
 		if(No == exoesk->in_operation)
 		{
-			home_state = prev_state + 1;
-			prev_state = home_state;
+			home_stage = prev_stage + 1;
+			prev_stage = home_stage;
 		}
 		break;
 	default:
@@ -478,7 +477,6 @@ static void home_f(st_exoesk * exoesk)
 	}
 
 }
-
 
 static void idle_f(st_exoesk * exoesk)
 {
@@ -500,7 +498,7 @@ static void prepare_action(st_exoesk * exoesk)
 	if(cmd_complete == 0)
 	{
 		steps = exoesk->bluetooth_command * 25;
-		gotopos_fn(exoesk, steps);
+		preset_fingers_target(exoesk, steps);
 		cmd_complete = 1;
 	}
 	else
@@ -509,7 +507,6 @@ static void prepare_action(st_exoesk * exoesk)
 	}
 }
 
-
 static uint8_t process_cmd(st_exoesk * exoesk)
 {
 	switch(exoesk->bluetooth_command)
@@ -517,10 +514,16 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	case not_used:
 		break;
 	case reference_routine:
+		ref_routine_fn(exoesk);
+		break;
 	case all_way_down:
+		preset_fingers_target(exoesk, MAX_POSITION);
+		break;
 	case all_way_up:
+		preset_fingers_target(exoesk, HOME_POSITION);
+		break;
 	case sinewave:
-		exo_preactions[exoesk->bluetooth_command-1](exoesk);
+		sinewave_fn(exoesk);
 		break;
 	case gotoposition:
 		return 0;
@@ -552,7 +555,6 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	return 1;
 
 }
-
 
 static void send_home(st_exoesk * exoesk)
 {
@@ -596,14 +598,6 @@ static uint8_t is_system_referenced(void)
 	else
 	{
 		return No;
-	}
-}
-
-static void finger_motion(st_exoesk * exoesk)
-{
-	if(exoesk->in_operation)
-	{
-		send_step_pulses(exoesk);
 	}
 }
 
@@ -670,20 +664,18 @@ static void alive_fn(void)
 
 static void ref_routine_fn(st_exoesk * exoesk)
 {
-
-}
-static void go_down_fn(st_exoesk * exoesk)
-{
-	exo_prepare(exoesk, MAX_POSITION);
-}
-static void go_up_fn(st_exoesk * exoesk)
-{
-	exo_prepare(exoesk, HOME_POSITION);
+	exoesk->fsm_state = home_fs;
 }
 
-static void gotopos_fn(st_exoesk * exoesk, uint16_t position)
+static void finger_default_conditions()
 {
-	exo_prepare(exoesk, position);
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		gfinger_params.fingers_in_op[finger] = No;
+		gfinger_params.fingers_in_pos[finger] = No;
+		gfinger_params.absolute_pos[finger] = HOME_POSITION;
+		home_routine[finger] = lost;
+	}
 }
 
 static void sinewave_fn(st_exoesk * exoesk)
@@ -691,7 +683,7 @@ static void sinewave_fn(st_exoesk * exoesk)
 
 }
 
-static void exo_prepare(st_exoesk * exoesk, uint16_t position)
+static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 {
 	uint8_t finger = thumb;
 	for(finger=thumb; finger<flength; finger++)
@@ -758,7 +750,6 @@ static void motor_wakeup(enum_ports port, uint16_t pin)
 		HAL_GPIO_WritePin(GPIOB, pin, GPIO_PIN_SET);
 }
 
-
 static void send_pulse(enum_ports port, uint16_t pin)
 {
 	if(port == portA)
@@ -766,12 +757,6 @@ static void send_pulse(enum_ports port, uint16_t pin)
 	else
 		HAL_GPIO_TogglePin(GPIOB, pin);
 }
-
-
-//static uint8_t is_finger_up(uint16_t finger_home_sensor)
-//{
-//	return HAL_GPIO_ReadPin(GPIOB, finger_home_sensor);
-//}
 
 static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir)
 {
