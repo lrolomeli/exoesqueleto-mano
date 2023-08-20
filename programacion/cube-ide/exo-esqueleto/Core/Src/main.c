@@ -586,14 +586,15 @@ static void send_home(st_exoesk * exoesk)
 
 static void toggle_finger(uint8_t btcmd)
 {
+
 	uint8_t finger = (btcmd - deselect_thumb);
 
 	if(finger < flength){
-		gfinger_params.fingers_in_op[finger % flength] = No;
+		gfinger_params.fingers_in_op[finger % flength] = Yes;
 	}
 	else
 	{
-		gfinger_params.fingers_in_op[finger % flength] = Yes;
+		gfinger_params.fingers_in_op[finger % flength] = No;
 	}
 
 }
