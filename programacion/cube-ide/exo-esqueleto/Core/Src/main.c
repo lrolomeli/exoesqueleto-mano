@@ -118,11 +118,14 @@ typedef enum{
 typedef struct{
 	enum_in_operation in_operation;
 	enum_fsm_state fsm_state;
+	uint8_t bluetooth_command;
+}st_exoesk;
+
+typedef struct{
 	uint16_t absolute_pos[flength];
 	uint16_t go_to[flength];
 	uint8_t fingers_in_op[flength];
-	uint8_t bluetooth_command;
-}st_exoesk;
+}st_gfinger_params;
 
 typedef struct{
 	const uint8_t port;
@@ -165,12 +168,13 @@ static const st_fconfig exoconfig[flength] = {
 };
 
 #ifdef test
-static enum_fingers finger_under_test = ring;
+static enum_fingers finger_under_test = index;
 #endif
 
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
+static uint8_t times = 0;
 //static const enum_stepping stepping = sixteen_step;
 
 /* USER CODE END PV */
@@ -231,6 +235,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 		if(home_routine[index] == home)
 		{
 			sleep_motor(exoconfig[index].sleep.port, exoconfig[index].sleep.pin);
+
 			home_routine[index] = referenced;
 		}
 	}
@@ -289,11 +294,13 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 {
 	if(htim->Instance == TIM3)
 	{
-		if(~timeout_flg)
+		if(timeout_flg==0)
 		{
 			timeout_flg = 1;
 		}
+
 	}
+
 }
 
 /* USER CODE END 0 */
@@ -305,8 +312,8 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef * htim)
 int main(void)
 {
   /* USER CODE BEGIN 1 */
+	uint8_t entramos=0;
 	st_exoesk exoesk = {No, home_fs, {0}, {0}, {0}, 0};
-
   /* USER CODE END 1 */
 
   /* MCU Configuration--------------------------------------------------------*/
@@ -347,9 +354,19 @@ int main(void)
 
 		if(timeout_flg)
 		{
-			dynamics(&exoesk);
+			// cada vez que entramos aqui ha pasado 1/2 ms
+			if (entramos<times) //entramos = 0(1/2ms), 1(1ms),2(1.5),3(2),4(2.5),5(3),6(3.5),7(4),8(4.5),9(5),10(5.5)
+			{
+				entramos++;
+			}
+			else
+			{
+				dynamics(&exoesk);
+				entramos = 0;
+			}
 			alive_fn();
 			timeout_flg = 0;
+
 		}
     /* USER CODE END WHILE */
 
@@ -395,8 +412,6 @@ void SystemClock_Config(void)
 }
 
 /* USER CODE BEGIN 4 */
-
-
 static void select_all_fingers(st_exoesk * exoesk)
 {
 	for(uint8_t finger=thumb; finger<flength; finger++)
@@ -447,7 +462,7 @@ static void home_f(st_exoesk * exoesk)
 		{
 			select_all_fingers(exoesk);
 			gotopos_fn(exoesk, Home_Steps);
-			home_state = 4; // idle
+			home_state = 3; // idle
 		}
 		else
 		{
@@ -455,7 +470,6 @@ static void home_f(st_exoesk * exoesk)
 		}
 		break;
 	case 3:
-		deselect_all_fingers(exoesk);
 		exoesk->fsm_state = idle_fs;
 		break;
 	case 4:
@@ -463,6 +477,22 @@ static void home_f(st_exoesk * exoesk)
 		if(No == exoesk->in_operation)
 		{
 			home_state = prev_state + 1;
+			prev_state = home_state;
+		}
+		else if(is_system_referenced())
+		{
+			exoesk->absolute_pos[thumb] = HOME_POSITION;
+			exoesk->absolute_pos[index] = HOME_POSITION;
+			exoesk->absolute_pos[middle] = HOME_POSITION;
+			exoesk->absolute_pos[ring] = HOME_POSITION;
+			exoesk->absolute_pos[little] = HOME_POSITION;
+			home_state = prev_state + 1;
+			prev_state = home_state;
+			exoesk->in_operation = No;
+		}
+		else
+		{
+
 		}
 		break;
 	default:
@@ -536,7 +566,7 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	case speed_3:
 	case speed_4:
 	case speed_5:
-		//setSpeed(exoesk->bluetooth_command - speed_0);
+		times = exoesk->bluetooth_command - speed_0;
 		break;
 	default:
 		break;
@@ -659,6 +689,7 @@ static void send_step_pulses(st_exoesk * exoesk)
 			if(exoesk->go_to[finger] == exoesk->absolute_pos[finger])
 			{
 				sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+				//finger_in_pos[finger] == Yes;
 				fingers_ready++;
 			}
 			else
@@ -683,6 +714,8 @@ static void send_step_pulses(st_exoesk * exoesk)
 #ifdef test
 	if(fingers_ready < 1)
 #else
+
+	//if(finger_in_pos[little] && finger_in_pos[ring] && finger_in_pos[middle] && finger_in_pos[index] && finger_in_pos[thumb])
 	if(fingers_ready < fingers_in_op)
 #endif
 	{
