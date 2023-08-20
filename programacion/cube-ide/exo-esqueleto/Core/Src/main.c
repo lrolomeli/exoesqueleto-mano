@@ -359,14 +359,13 @@ int main(void)
 			{
 				entramos++;
 			}
-			else
+			else 
 			{
 				dynamics(&exoesk);
 				entramos = 0;
 			}
 			alive_fn();
 			timeout_flg = 0;
-
 		}
     /* USER CODE END WHILE */
 
