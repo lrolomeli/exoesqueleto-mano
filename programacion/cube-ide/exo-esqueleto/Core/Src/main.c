@@ -81,7 +81,7 @@ typedef enum{
 	select_middle = 0x7C,
 	select_ring = 0x7D,
 	select_little = 0x7E,
-	stopped = 0x7F,
+	stop = 0x7F,
 	speed_0 = 0xFA,
 	speed_1 = 0xFB,
 	speed_2 = 0xFC,
@@ -196,7 +196,6 @@ static void motor_wakeup(enum_ports port, uint16_t pin);
 static void sleep_motor(enum_ports port, uint16_t pin);
 static void clean_buffer(uint8_t * buf);
 static void sinewave_fn(st_exoesk * exoesk);
-static void ref_routine_fn(st_exoesk * exoesk);
 static void preset_fingers_target(st_exoesk * exoesk, uint16_t position);
 static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
@@ -204,6 +203,7 @@ static void toggle_finger(uint8_t btcmd);
 static uint8_t is_system_referenced(void);
 static void send_home(st_exoesk * exoesk);
 static void select_all_fingers(st_exoesk * exoesk);
+static void deselect_all_fingers(st_exoesk * exoesk);
 static void prepare_action(st_exoesk * exoesk);
 static void dynamics(st_exoesk * exoesk);
 static void home_f(st_exoesk * exoesk);
@@ -410,24 +410,6 @@ void SystemClock_Config(void)
 
 /* USER CODE BEGIN 4 */
 
-static void select_all_fingers(st_exoesk * exoesk)
-{
-	for(uint8_t finger=thumb; finger<flength; finger++)
-	{
-		gfinger_params.fingers_in_op[finger] = Yes;
-	}
-}
-
-static void dynamics(st_exoesk * exoesk)
-{
-	if(exoesk->in_operation)
-	{
-		/* Move fingers */
-		send_step_pulses(exoesk);
-	}
-
-}
-
 static void home_f(st_exoesk * exoesk)
 {
 	static enum_home_stages home_stage = ReleaseHomeButtons;
@@ -460,6 +442,7 @@ static void home_f(st_exoesk * exoesk)
 		}
 		break;
 	case HomeRoutineComplete:
+		deselect_all_fingers(exoesk);
 		exoesk->fsm_state = idle_fs;
 		home_stage = ReleaseHomeButtons;
 		prev_stage = ReleaseHomeButtons;
@@ -490,6 +473,16 @@ static void idle_f(st_exoesk * exoesk)
 
 }
 
+static void dynamics(st_exoesk * exoesk)
+{
+	if(exoesk->in_operation)
+	{
+		/* Move fingers */
+		send_step_pulses(exoesk);
+	}
+
+}
+
 static void prepare_action(st_exoesk * exoesk)
 {
 	static uint8_t cmd_complete = 1;
@@ -514,7 +507,7 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	case not_used:
 		break;
 	case reference_routine:
-		ref_routine_fn(exoesk);
+		exoesk->fsm_state = home_fs;
 		break;
 	case all_way_down:
 		preset_fingers_target(exoesk, MAX_POSITION);
@@ -542,6 +535,10 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	case select_little:
 		toggle_finger(exoesk->bluetooth_command);
 		break;
+	case stop:
+		exoesk->in_operation = No;
+
+		break;
 	case speed_1:
 	case speed_2:
 	case speed_3:
@@ -554,6 +551,22 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	}
 	return 1;
 
+}
+
+static void select_all_fingers(st_exoesk * exoesk)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		gfinger_params.fingers_in_op[finger] = Yes;
+	}
+}
+
+static void deselect_all_fingers(st_exoesk * exoesk)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		gfinger_params.fingers_in_op[finger] = Yes;
+	}
 }
 
 static void send_home(st_exoesk * exoesk)
@@ -660,11 +673,6 @@ static void alive_fn(void)
 		var = 2000;
 		HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 	}
-}
-
-static void ref_routine_fn(st_exoesk * exoesk)
-{
-	exoesk->fsm_state = home_fs;
 }
 
 static void finger_default_conditions()
