@@ -377,7 +377,7 @@
    <widget class="QSlider" name="angle_slider">
     <property name="geometry">
      <rect>
-      <x>20</x>
+      <x>10</x>
       <y>80</y>
       <width>211</width>
       <height>51</height>
@@ -387,13 +387,16 @@
      <number>0</number>
     </property>
     <property name="maximum">
-     <number>120</number>
+     <number>90</number>
     </property>
     <property name="pageStep">
-     <number>10</number>
+     <number>1</number>
+    </property>
+    <property name="value">
+     <number>0</number>
     </property>
     <property name="sliderPosition">
-     <number>70</number>
+     <number>0</number>
     </property>
     <property name="orientation">
      <enum>Qt::Horizontal</enum>
@@ -433,7 +436,7 @@
      </font>
     </property>
     <property name="text">
-     <string>70°</string>
+     <string>0°</string>
     </property>
    </widget>
    <widget class="QSlider" name="Reps_Slider">
@@ -546,7 +549,33 @@
     </property>
     <property name="icon">
      <iconset>
-      <normaloff>../../../../../BIOMEDICA/boton_stop.jpg</normaloff>../../../../../BIOMEDICA/boton_stop.jpg</iconset>
+      <normaloff>../../../../../Pictures/captura_boton.png</normaloff>../../../../../Pictures/captura_boton.png</iconset>
+    </property>
+    <property name="iconSize">
+     <size>
+      <width>100</width>
+      <height>100</height>
+     </size>
+    </property>
+    <property name="autoRepeat">
+     <bool>true</bool>
+    </property>
+   </widget>
+   <widget class="QPushButton" name="start_boton">
+    <property name="geometry">
+     <rect>
+      <x>320</x>
+      <y>330</y>
+      <width>101</width>
+      <height>101</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string/>
+    </property>
+    <property name="icon">
+     <iconset>
+      <normaloff>../../imagenes/boton_start.jpg</normaloff>../../imagenes/boton_start.jpg</iconset>
     </property>
     <property name="iconSize">
      <size>
@@ -585,6 +614,7 @@
    <zorder>Reps_label_2</zorder>
    <zorder>PN_label</zorder>
    <zorder>stop_boton</zorder>
+   <zorder>start_boton</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
