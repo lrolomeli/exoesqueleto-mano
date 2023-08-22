@@ -698,12 +698,11 @@ static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 	{
 		if(gfinger_params.fingers_in_op[finger])
 		{
-			gfinger_params.go_to[finger] = position;
 			// things to prevent
 			// 1. that current position is not the same as to go position
 			// 2. that to go position is not greather than maximum position
 			// 3. that to go position is not smaller than minimum position
-			if(gfinger_params.absolute_pos[finger] != gfinger_params.go_to[finger] && gfinger_params.go_to[finger] <= MAX_POSITION && gfinger_params.go_to[finger] >= HOME_POSITION)
+			if((gfinger_params.absolute_pos[finger] != position) && (MAX_POSITION >= position) && (HOME_POSITION <= position))
 			{
 				/* finger current position differs from go_to position */
 				if(gfinger_params.go_to[finger] > gfinger_params.absolute_pos[finger])
