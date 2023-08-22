@@ -17,6 +17,9 @@ class Exoesqueleto(QMainWindow):
         self.middle_v = False
         self.ring_v = False
         self.little_v = False
+        self.Maxsteps=3000
+        self.steps_per_angle =25 
+        self.angle=0
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.label_thumb.setVisible(False)
@@ -37,11 +40,15 @@ class Exoesqueleto(QMainWindow):
         self.ui.angle_slider.valueChanged.connect(self.gotopos)
         self.ui.Reps_Slider.valueChanged.connect(self.reps)
         self.ui.stop_boton.clicked.connect(self.stopped)
+        self.ui.start_boton.clicked.connect(self.start)
         self.speedcmd=["FB","FC","FD","FE","FF"]
        
 
     def reps(self, value):   
         self.ui.Reps_label_2.setText(str(value))
+
+    def start(self):   
+        print("start routine")
 
     def stopped (self):
         print("stop")
@@ -51,6 +58,11 @@ class Exoesqueleto(QMainWindow):
          
     def gotopos(self, value):
         self.ui.angle_label.setText(str(value))
+        steps=self.Maxsteps-(self.steps_per_angle*value)
+        steps=int(steps / 25)
+        steps=hex(steps)
+        print(str(steps)[2:])
+
         #self.ser.write(bytes.fromhex("05"))
         #self.ser.write(bytes.fromhex(hex(value)))
 
@@ -67,7 +79,7 @@ class Exoesqueleto(QMainWindow):
         event.accept() # let the window close
 
     def connect_bluetooth(self):
-        self.ser = serial.Serial(port='COM12', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self.ser = serial.Serial(port='COM3', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
         print("connected")
         
     def thumb(self):
@@ -123,9 +135,10 @@ class Exoesqueleto(QMainWindow):
     def ciclos(self):
         for i in range(10):
             #print("down")
-            self.ser.write(bytes.fromhex("02"))
+            self.ser.write(bytes.fromhex("05"))
+            self.ser.write(bytes.fromhex("78"))
             time.sleep(4)
-            self.ser.write(bytes.fromhex("03"))
+            self.ser.write(bytes.fromhex("05"))
             time.sleep(4)
         print(self.ser)
 
