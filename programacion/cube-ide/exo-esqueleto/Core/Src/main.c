@@ -55,7 +55,8 @@ typedef enum{
 	GoTowardsHomeButtons,
 	PlaceInStartPosition,
 	HomeRoutineComplete,
-	HomeIdleStage
+	HomeIdleStage,
+	ErrorHoming
 }enum_home_stages;
 
 
@@ -210,6 +211,7 @@ static void home_f(st_exoesk * exoesk);
 static void idle_f(st_exoesk * exoesk);
 static void finger_default_conditions();
 static uint8_t process_cmd(st_exoesk * exoesk);
+static void emergency_stop(void);
 
 /* USER CODE END PFP */
 
@@ -436,9 +438,15 @@ static void home_f(st_exoesk * exoesk)
 			preset_fingers_target(exoesk, Default_Steps);
 			home_stage = HomeIdleStage;
 		}
-		else
+		else if (exoesk->in_operation)
 		{
 			home_stage = PlaceInStartPosition;
+		}
+		else
+		{
+			emergency_stop();
+			finger_default_conditions();
+			home_stage = ErrorHoming;
 		}
 		break;
 	case HomeRoutineComplete:
@@ -576,7 +584,7 @@ static void send_home(st_exoesk * exoesk)
 	{
 		set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
 		motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-		gfinger_params.absolute_pos[finger] = UNKNOWN;
+		gfinger_params.absolute_pos[finger] = MAX_POSITION;
 		gfinger_params.go_to[finger] = HOME_POSITION;
 		home_routine[finger] = home;
 		gfinger_params.fingers_in_pos[finger] = No;
@@ -740,6 +748,11 @@ static void clean_buffer(uint8_t * buf)
 {
 	*buf = 0;
 	buffer_status = empty;
+}
+
+static void emergency_stop(void)
+{
+	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 }
 
 static void sleep_motor(enum_ports port, uint16_t pin)
