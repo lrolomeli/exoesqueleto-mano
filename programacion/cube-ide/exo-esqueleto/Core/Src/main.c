@@ -415,6 +415,7 @@ static void home_f(st_exoesk * exoesk)
 {
 	static enum_home_stages home_stage = ReleaseHomeButtons;
 	static enum_home_stages prev_stage = ReleaseHomeButtons;
+	static uint16_t failure_blinking_delay = 10000;
 
 	switch(home_stage)
 	{
@@ -463,6 +464,15 @@ static void home_f(st_exoesk * exoesk)
 		}
 		break;
 	default:
+		if(failure_blinking_delay > 0)
+		{
+			failure_blinking_delay--;
+		}
+		else
+		{
+			failure_blinking_delay = 10000;
+			HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
+		}
 		break;
 	}
 
@@ -624,8 +634,8 @@ static uint8_t is_system_referenced(void)
 
 static void send_step_pulses(st_exoesk * exoesk)
 {
-	uint8_t finger = 0;
-	for(finger=0; finger<flength; finger++)
+	uint8_t finger = thumb;
+	for(finger = thumb; finger < flength; finger++)
 	{
 		if(gfinger_params.fingers_in_op[finger])
 		{
