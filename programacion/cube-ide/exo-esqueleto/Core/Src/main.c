@@ -392,13 +392,14 @@ static void home_f(st_exoesk * exoesk)
 	case GoTowardsHomeButtons:
 		select_all_fingers(exoesk);
 		send_home(exoesk);
-		home_stage = HomeIdleStage;
+		home_stage = PlaceInStartPosition;
 		break;
 	case PlaceInStartPosition:
 		if(is_system_referenced())
 		{
 			select_all_fingers(exoesk);
 			preset_fingers_target(exoesk, Default_Steps);
+			prev_stage = PlaceInStartPosition;
 			home_stage = HomeIdleStage;
 		}
 		else if (exoesk->in_operation)
@@ -419,7 +420,6 @@ static void home_f(st_exoesk * exoesk)
 		prev_stage = ReleaseHomeButtons;
 		break;
 	case HomeIdleStage:
-		// home idle
 		if(No == exoesk->in_operation)
 		{
 			home_stage = prev_stage + 1;
@@ -661,8 +661,6 @@ static void finger_default_conditions()
 	for(uint8_t finger=thumb; finger<flength; finger++)
 	{
 		gfinger_params.fingers_in_op[finger] = No;
-		gfinger_params.fingers_in_pos[finger] = No;
-		gfinger_params.absolute_pos[finger] = UNKNOWN;
 		home_routine[finger] = lost;
 	}
 }
