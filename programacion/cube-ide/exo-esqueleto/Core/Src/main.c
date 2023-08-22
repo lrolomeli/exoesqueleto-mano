@@ -182,6 +182,7 @@ static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
 static volatile st_gfinger_params gfinger_params = { {0},{0},{0},{0} };
+static const uint8_t hfingers[9] = {index,middle,ring,0,little,0,0,0,thumb};
 
 /* USER CODE END PV */
 
@@ -220,63 +221,25 @@ static const func_ptr_t fsm_state[2] = {home_f, idle_f};
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
-	if(exoconfig[index].home.pin == GPIO_Pin)
+	uint8_t finger = 0;
+
+	GPIO_Pin = GPIO_Pin >> 6;
+	finger = hfingers[GPIO_Pin];
+
+	if(home_routine[finger] == home)
 	{
-		if(home_routine[index] == home)
-		{
-			sleep_motor(exoconfig[index].sleep.port, exoconfig[index].sleep.pin);
-			gfinger_params.fingers_in_pos[index] = Yes;
-			gfinger_params.absolute_pos[index] = 0; //HOME_POSITION;
-			home_routine[index] = referenced;
-		}
+		sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+		gfinger_params.fingers_in_pos[finger] = Yes;
+		gfinger_params.absolute_pos[finger] = HOME_POSITION;
+		home_routine[finger] = referenced;
 	}
-
-	if(exoconfig[thumb].home.pin == GPIO_Pin)
+	else
 	{
-		if(home_routine[thumb] == home)
-		{
-			sleep_motor(exoconfig[thumb].sleep.port, exoconfig[thumb].sleep.pin);
-			gfinger_params.fingers_in_pos[thumb] = Yes;
-			gfinger_params.absolute_pos[thumb] = 0;
-			home_routine[thumb] = referenced;
-		}
+		gfinger_params.fingers_in_pos[finger] = Yes;
+		gfinger_params.absolute_pos[finger] = HOME_POSITION;
+		sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+		home_routine[finger] = lost;
 	}
-
-
-
-	if(exoconfig[middle].home.pin == GPIO_Pin)
-	{
-		if(home_routine[middle] == home)
-		{
-			sleep_motor(exoconfig[middle].sleep.port, exoconfig[middle].sleep.pin);
-			gfinger_params.fingers_in_pos[middle] = Yes;
-			gfinger_params.absolute_pos[middle] = 0;
-			home_routine[middle] = referenced;
-		}
-	}
-
-	if(exoconfig[ring].home.pin == GPIO_Pin)
-	{
-		if(home_routine[ring] == home)
-		{
-			sleep_motor(exoconfig[ring].sleep.port, exoconfig[ring].sleep.pin);
-			gfinger_params.fingers_in_pos[ring] = Yes;
-			gfinger_params.absolute_pos[ring] = 0;
-			home_routine[ring] = referenced;
-		}
-	}
-
-	if(exoconfig[little].home.pin == GPIO_Pin)
-	{
-		if(home_routine[little] == home)
-		{
-			sleep_motor(exoconfig[little].sleep.port, exoconfig[little].sleep.pin);
-			gfinger_params.fingers_in_pos[little] = Yes;
-			gfinger_params.absolute_pos[little] = 0;
-			home_routine[little] = referenced;
-		}
-	}
-
 }
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
@@ -699,7 +662,7 @@ static void finger_default_conditions()
 	{
 		gfinger_params.fingers_in_op[finger] = No;
 		gfinger_params.fingers_in_pos[finger] = No;
-		gfinger_params.absolute_pos[finger] = HOME_POSITION;
+		gfinger_params.absolute_pos[finger] = UNKNOWN;
 		home_routine[finger] = lost;
 	}
 }
