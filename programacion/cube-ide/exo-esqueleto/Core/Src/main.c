@@ -183,15 +183,13 @@ static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
 static volatile st_gfinger_params gfinger_params = { {0},{0},{0},{0} };
 
-//static const enum_stepping stepping = sixteen_step;
-
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
+
 static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
-//static uint8_t is_finger_up(uint16_t finger_home_sensor);
 static void send_pulse(enum_ports port, uint16_t pin);
 static void motor_wakeup(enum_ports port, uint16_t pin);
 static void sleep_motor(enum_ports port, uint16_t pin);
@@ -217,7 +215,8 @@ static void emergency_stop(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-func_ptr_t fsm_state[2] = {home_f, idle_f};
+
+static const func_ptr_t fsm_state[2] = {home_f, idle_f};
 
 void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 {
@@ -713,17 +712,19 @@ static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 			// 3. that to go position is not smaller than minimum position
 			if((gfinger_params.absolute_pos[finger] != position) && (MAX_POSITION >= position) && (HOME_POSITION <= position))
 			{
-				/* finger current position differs from go_to position */
-				if(gfinger_params.go_to[finger] > gfinger_params.absolute_pos[finger])
-					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
-				else
-					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
-
-				motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-
 				gfinger_params.go_to[finger] = position;
 				/* finger is not in position */
 				gfinger_params.fingers_in_pos[finger] = No;
+				/* finger current position differs from go_to position */
+				if(gfinger_params.go_to[finger] > gfinger_params.absolute_pos[finger])
+				{
+					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
+				}
+				else
+				{
+					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
+				}
+				motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 			}
 		}
 	}
