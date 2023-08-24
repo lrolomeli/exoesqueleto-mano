@@ -43,7 +43,7 @@ typedef enum{
 typedef enum{
 	No = 0,
 	Yes
-}enum_in_operation;
+}enum_bit_state;
 
 typedef enum{
 	Unreferenced = 0,
@@ -52,10 +52,10 @@ typedef enum{
 
 typedef enum{
 	ReleaseHomeButtons = 0,
+	WaitReleaseStage,
 	GoTowardsHomeButtons,
-	PlaceInStartPosition,
+	GoInitialPosition,
 	HomeRoutineComplete,
-	HomeIdleStage,
 	ErrorHoming
 }enum_home_stages;
 
@@ -125,7 +125,7 @@ typedef enum{
 }enum_fsm_state;
 
 typedef struct{
-	enum_in_operation in_operation;
+	enum_bit_state in_operation;
 	enum_fsm_state fsm_state;
 	uint8_t bluetooth_command;
 }st_exoesk;
@@ -133,8 +133,8 @@ typedef struct{
 typedef struct{
 	uint16_t current_pos[flength];
 	uint16_t go_to[flength];
-	uint8_t fingers_in_op[flength];
-	uint8_t fingers_in_pos[flength];
+	enum_bit_state fingers_in_op[flength];
+	enum_bit_state fingers_in_pos[flength];
 }st_gfinger_params;
 
 typedef struct{
@@ -190,10 +190,10 @@ static const uint8_t hfingers[9] = {index,middle,ring,0,little,0,0,0,thumb};
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
 
-static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir);
-static void send_pulse(enum_ports port, uint16_t pin);
-static void motor_wakeup(enum_ports port, uint16_t pin);
-static void sleep_motor(enum_ports port, uint16_t pin);
+static void set_direction(uint8_t finger, GPIO_PinState dir);
+static void sleep_motor(uint8_t finger);
+static void motor_wakeup(uint8_t finger);
+static void send_pulse(uint8_t finger);
 static void clean_buffer(uint8_t * buf);
 static void sinewave_fn(st_exoesk * exoesk);
 static void preset_fingers_target(st_exoesk * exoesk, uint16_t position);
@@ -210,7 +210,9 @@ static void home_f(st_exoesk * exoesk);
 static void idle_f(st_exoesk * exoesk);
 static void finger_default_conditions();
 static uint8_t process_cmd(st_exoesk * exoesk);
+static uint8_t fingers_in_position(void);
 static void emergency_stop(void);
+
 
 /* USER CODE END PFP */
 
@@ -228,7 +230,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	if(home_routine[finger] == home)
 	{
-		sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+		sleep_motor(finger);
 		gfinger_params.fingers_in_pos[finger] = Yes;
 		gfinger_params.current_pos[finger] = HOME_POSITION;
 		home_routine[finger] = referenced;
@@ -237,7 +239,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		gfinger_params.fingers_in_pos[finger] = Yes;
 		gfinger_params.current_pos[finger] = HOME_POSITION;
-		sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+		sleep_motor(finger);
 		home_routine[finger] = lost;
 	}
 }
@@ -377,33 +379,36 @@ void SystemClock_Config(void)
 static void home_f(st_exoesk * exoesk)
 {
 	static enum_home_stages home_stage = ReleaseHomeButtons;
-	static enum_home_stages prev_stage = ReleaseHomeButtons;
 	static uint16_t failure_blinking_delay = 10000;
 
 	switch(home_stage)
 	{
 	case ReleaseHomeButtons:
-		finger_default_conditions();
+		// Seleccionamos los dedos que queremos mover en este caso todos.
 		select_all_fingers(exoesk);
-		preset_fingers_target(exoesk, Home_Steps);
-		home_stage = HomeIdleStage;
+		// Definimos el objetivo al que hay que movernos. Los pasos necesarios para despejar el boton.
+		preset_fingers_target(exoesk, Clear_Button_Distance);
+		// Esperar a que se despejen los motores
+		home_stage = WaitReleaseStage;
+		break;
+	case WaitReleaseStage:
+		if(No == exoesk->in_operation)
+		{
+			// Definimos el objetivo al que hay que movernos. Los pasos necesarios para volver al boton
+			send_home(exoesk);
+			home_stage = GoTowardsHomeButtons;
+		}
 		break;
 	case GoTowardsHomeButtons:
-		select_all_fingers(exoesk);
-		send_home(exoesk);
-		home_stage = PlaceInStartPosition;
-		break;
-	case PlaceInStartPosition:
 		if(is_system_referenced())
 		{
-			select_all_fingers(exoesk);
-			preset_fingers_target(exoesk, Default_Steps);
-			prev_stage = PlaceInStartPosition;
-			home_stage = HomeIdleStage;
+			// Definimos el objetivo al que hay que movernos. Los pasos necesarios para despejar el boton.
+			preset_fingers_target(exoesk, Initial_Position);
+			home_stage = GoInitialPosition;
 		}
 		else if (exoesk->in_operation)
 		{
-			home_stage = PlaceInStartPosition;
+			home_stage = GoTowardsHomeButtons;
 		}
 		else
 		{
@@ -412,20 +417,20 @@ static void home_f(st_exoesk * exoesk)
 			home_stage = ErrorHoming;
 		}
 		break;
-	case HomeRoutineComplete:
-		deselect_all_fingers(exoesk);
-		exoesk->fsm_state = idle_fs;
-		home_stage = ReleaseHomeButtons;
-		prev_stage = ReleaseHomeButtons;
-		break;
-	case HomeIdleStage:
+	case GoInitialPosition:
 		if(No == exoesk->in_operation)
 		{
-			home_stage = prev_stage + 1;
-			prev_stage = home_stage;
+			deselect_all_fingers(exoesk);
+			home_stage = HomeRoutineComplete;
+			exoesk->fsm_state = idle_fs;
 		}
 		break;
-	default:
+	case HomeRoutineComplete:
+		// Comenzamos con condiciones iniciales
+		finger_default_conditions();
+		home_stage = ReleaseHomeButtons;
+		break;
+	case ErrorHoming:
 		if(failure_blinking_delay > 0)
 		{
 			failure_blinking_delay--;
@@ -435,6 +440,8 @@ static void home_f(st_exoesk * exoesk)
 			failure_blinking_delay = 10000;
 			HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
 		}
+		break;
+	default:
 		break;
 	}
 
@@ -550,15 +557,17 @@ static void deselect_all_fingers(st_exoesk * exoesk)
 
 static void send_home(st_exoesk * exoesk)
 {
-	uint8_t finger=0;
-	for(finger=0; finger<flength; finger++)
+	uint8_t finger=thumb;
+	for(finger=thumb; finger<flength; finger++)
 	{
-		set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
-		motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-		gfinger_params.current_pos[finger] = MAX_POSITION;
+		gfinger_params.current_pos[finger] = UNDEFINED;
 		gfinger_params.go_to[finger] = HOME_POSITION;
+
 		home_routine[finger] = home;
 		gfinger_params.fingers_in_pos[finger] = No;
+
+		set_direction(finger, Up);
+		motor_wakeup(finger);
 	}
 	exoesk->in_operation = Yes;
 }
@@ -605,13 +614,13 @@ static void send_step_pulses(st_exoesk * exoesk)
 			if(gfinger_params.go_to[finger] == gfinger_params.current_pos[finger])
 			{
 				/* when finger has reached expected position */
-				sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+				sleep_motor(finger);
 				gfinger_params.fingers_in_pos[finger] = Yes;
 			}
 			else
 			{
 				/* finger has not reached expected position */
-				send_pulse(exoconfig[finger].step.port, exoconfig[finger].step.pin);
+				send_pulse(finger);
 				if(gfinger_params.go_to[finger] > gfinger_params.current_pos[finger])
 				{
 					gfinger_params.current_pos[finger]++;
@@ -625,11 +634,7 @@ static void send_step_pulses(st_exoesk * exoesk)
 	}
 
 	/* if all fingers are in position we should sleep the system */
-	if(gfinger_params.fingers_in_pos[little] &&
-	gfinger_params.fingers_in_pos[ring] &&
-	gfinger_params.fingers_in_pos[middle] && 
-	gfinger_params.fingers_in_pos[index] &&
-	gfinger_params.fingers_in_pos[thumb])
+	if(fingers_in_position())
 	{
 		exoesk->in_operation = No;
 	}
@@ -677,6 +682,14 @@ static void sinewave_fn(st_exoesk * exoesk)
 
 }
 
+/**
+ * preset_fingers_target function
+ *
+ * 1) Revisa cual dedo se encuentra habilitado para moverse.
+ * 2) Establece el objetivo al que hay que mover cada dedo
+ * 3)
+ *
+ */
 static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 {
 	uint8_t finger = thumb;
@@ -684,35 +697,35 @@ static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 	{
 		if(gfinger_params.fingers_in_op[finger])
 		{
+			gfinger_params.fingers_in_pos[finger] = No;
+			gfinger_params.go_to[finger] = position;
 			// things to prevent
-			// 1. that current position is not the same as to go position
-			// 2. that to go position is not greather than maximum position
-			// 3. that to go position is not smaller than minimum position
-			if((gfinger_params.current_pos[finger] != position) && (MAX_POSITION >= position) && (HOME_POSITION <= position))
+			if (gfinger_params.current_pos[finger] < position)
 			{
-				gfinger_params.go_to[finger] = position;
-				/* finger is not in position */
-				gfinger_params.fingers_in_pos[finger] = No;
-				/* finger current position differs from go_to position */
-				if(gfinger_params.go_to[finger] > gfinger_params.current_pos[finger])
+				// goto position is not greater than maximum position
+				if(MAX_POSITION < position)
 				{
-					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
+					gfinger_params.go_to[finger] = MAX_POSITION;
 				}
-				else
-				{
-					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
-				}
-				motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
+				set_direction(finger, Down);
+				motor_wakeup(finger);
+			}
+			else if(gfinger_params.current_pos[finger] > position)
+			{
+				set_direction(finger, Up);
+				motor_wakeup(finger);
+			}
+			else
+			{
+				// current position is not the same as goto position
+				gfinger_params.go_to[finger] = gfinger_params.current_pos[finger];
+				gfinger_params.fingers_in_pos[finger] = Yes;
 			}
 		}
 	}
 
 	/* if all fingers are in position we should do nothing */
-	if(gfinger_params.fingers_in_pos[thumb] &&
-	gfinger_params.fingers_in_pos[index] &&
-	gfinger_params.fingers_in_pos[middle] && 
-	gfinger_params.fingers_in_pos[ring] &&
-	gfinger_params.fingers_in_pos[little])
+	if(fingers_in_position())
 	{
 		exoesk->in_operation = No;
 	}
@@ -721,6 +734,15 @@ static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 		exoesk->in_operation = Yes;
 	}
 
+}
+
+static uint8_t fingers_in_position()
+{
+	return (gfinger_params.fingers_in_pos[thumb] &&
+			gfinger_params.fingers_in_pos[index] &&
+			gfinger_params.fingers_in_pos[middle] &&
+			gfinger_params.fingers_in_pos[ring] &&
+			gfinger_params.fingers_in_pos[little]);
 }
 
 static void clean_buffer(uint8_t * buf)
@@ -734,36 +756,37 @@ static void emergency_stop(void)
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 }
 
-static void sleep_motor(enum_ports port, uint16_t pin)
+static void sleep_motor(uint8_t finger)
 {
-	if(port == portA)
-		HAL_GPIO_WritePin(GPIOA, pin, GPIO_PIN_RESET);
+	if(exoconfig[finger].sleep.port == portA)
+		HAL_GPIO_WritePin(GPIOA, exoconfig[finger].sleep.pin, GPIO_PIN_RESET);
 	else
-		HAL_GPIO_WritePin(GPIOB, pin, GPIO_PIN_RESET);
+		HAL_GPIO_WritePin(GPIOB, exoconfig[finger].sleep.pin, GPIO_PIN_RESET);
 }
 
-static void motor_wakeup(enum_ports port, uint16_t pin)
+static void motor_wakeup(uint8_t finger)
 {
-	if(port == portA)
-		HAL_GPIO_WritePin(GPIOA, pin, GPIO_PIN_SET);
+	if(exoconfig[finger].sleep.port == portA)
+		HAL_GPIO_WritePin(GPIOA, exoconfig[finger].sleep.pin, GPIO_PIN_SET);
 	else
-		HAL_GPIO_WritePin(GPIOB, pin, GPIO_PIN_SET);
+		HAL_GPIO_WritePin(GPIOB, exoconfig[finger].sleep.pin, GPIO_PIN_SET);
 }
 
-static void send_pulse(enum_ports port, uint16_t pin)
+static void send_pulse(uint8_t finger)
 {
-	if(port == portA)
-		HAL_GPIO_TogglePin(GPIOA, pin);
+	if(exoconfig[finger].step.port == portA)
+		HAL_GPIO_TogglePin(GPIOA, exoconfig[finger].step.pin);
 	else
-		HAL_GPIO_TogglePin(GPIOB, pin);
+		HAL_GPIO_TogglePin(GPIOB, exoconfig[finger].step.pin);
 }
 
-static void set_direction(enum_ports port, uint16_t pin, GPIO_PinState dir)
+static void set_direction(uint8_t finger, GPIO_PinState dir)
 {
-	if(port == portA)
-		HAL_GPIO_WritePin(GPIOA, pin, dir);
+
+	if(exoconfig[finger].direction.port == portA)
+		HAL_GPIO_WritePin(GPIOA, exoconfig[finger].direction.pin, dir);
 	else
-		HAL_GPIO_WritePin(GPIOB, pin, dir);
+		HAL_GPIO_WritePin(GPIOB, exoconfig[finger].direction.pin, dir);
 }
 
 /* USER CODE END 4 */
