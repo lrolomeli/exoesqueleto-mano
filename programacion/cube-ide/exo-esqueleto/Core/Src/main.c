@@ -131,7 +131,7 @@ typedef struct{
 }st_exoesk;
 
 typedef struct{
-	uint16_t absolute_pos[flength];
+	uint16_t current_pos[flength];
 	uint16_t go_to[flength];
 	uint8_t fingers_in_op[flength];
 	uint8_t fingers_in_pos[flength];
@@ -230,13 +230,13 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 		sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 		gfinger_params.fingers_in_pos[finger] = Yes;
-		gfinger_params.absolute_pos[finger] = HOME_POSITION;
+		gfinger_params.current_pos[finger] = HOME_POSITION;
 		home_routine[finger] = referenced;
 	}
 	else
 	{
 		gfinger_params.fingers_in_pos[finger] = Yes;
-		gfinger_params.absolute_pos[finger] = HOME_POSITION;
+		gfinger_params.current_pos[finger] = HOME_POSITION;
 		sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
 		home_routine[finger] = lost;
 	}
@@ -385,7 +385,6 @@ static void home_f(st_exoesk * exoesk)
 	case ReleaseHomeButtons:
 		finger_default_conditions();
 		select_all_fingers(exoesk);
-		/* Before this we have to reset preconditions */
 		preset_fingers_target(exoesk, Home_Steps);
 		home_stage = HomeIdleStage;
 		break;
@@ -556,7 +555,7 @@ static void send_home(st_exoesk * exoesk)
 	{
 		set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Up);
 		motor_wakeup(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
-		gfinger_params.absolute_pos[finger] = MAX_POSITION;
+		gfinger_params.current_pos[finger] = MAX_POSITION;
 		gfinger_params.go_to[finger] = HOME_POSITION;
 		home_routine[finger] = home;
 		gfinger_params.fingers_in_pos[finger] = No;
@@ -603,7 +602,7 @@ static void send_step_pulses(st_exoesk * exoesk)
 		if(gfinger_params.fingers_in_op[finger])
 		{
 			/* when finger is selected to be moved */
-			if(gfinger_params.go_to[finger] == gfinger_params.absolute_pos[finger])
+			if(gfinger_params.go_to[finger] == gfinger_params.current_pos[finger])
 			{
 				/* when finger has reached expected position */
 				sleep_motor(exoconfig[finger].sleep.port, exoconfig[finger].sleep.pin);
@@ -613,13 +612,13 @@ static void send_step_pulses(st_exoesk * exoesk)
 			{
 				/* finger has not reached expected position */
 				send_pulse(exoconfig[finger].step.port, exoconfig[finger].step.pin);
-				if(gfinger_params.go_to[finger] > gfinger_params.absolute_pos[finger])
+				if(gfinger_params.go_to[finger] > gfinger_params.current_pos[finger])
 				{
-					gfinger_params.absolute_pos[finger]++;
+					gfinger_params.current_pos[finger]++;
 				}
 				else
 				{
-					gfinger_params.absolute_pos[finger]--;
+					gfinger_params.current_pos[finger]--;
 				}
 			}
 		}
@@ -660,8 +659,16 @@ static void finger_default_conditions()
 {
 	for(uint8_t finger=thumb; finger<flength; finger++)
 	{
+		/* el dedo no esta en operacion */
 		gfinger_params.fingers_in_op[finger] = No;
+		/* la rutina de home no se ha completado */
 		home_routine[finger] = lost;
+		/* no se conoce la posicion del motor */
+		gfinger_params.current_pos[finger] = NOT_KNOWN_POSITION;
+		/* no se ha determinado la posicion a la que vamos a movernos */
+		gfinger_params.go_to[finger] = NOT_KNOWN_POSITION;
+		/* el dedo esta en cierta posicion y por lo tanto no se esta moviendo */
+		gfinger_params.fingers_in_pos[finger] = Yes;
 	}
 }
 
@@ -681,13 +688,13 @@ static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 			// 1. that current position is not the same as to go position
 			// 2. that to go position is not greather than maximum position
 			// 3. that to go position is not smaller than minimum position
-			if((gfinger_params.absolute_pos[finger] != position) && (MAX_POSITION >= position) && (HOME_POSITION <= position))
+			if((gfinger_params.current_pos[finger] != position) && (MAX_POSITION >= position) && (HOME_POSITION <= position))
 			{
 				gfinger_params.go_to[finger] = position;
 				/* finger is not in position */
 				gfinger_params.fingers_in_pos[finger] = No;
 				/* finger current position differs from go_to position */
-				if(gfinger_params.go_to[finger] > gfinger_params.absolute_pos[finger])
+				if(gfinger_params.go_to[finger] > gfinger_params.current_pos[finger])
 				{
 					set_direction(exoconfig[finger].direction.port, exoconfig[finger].direction.pin, Down);
 				}

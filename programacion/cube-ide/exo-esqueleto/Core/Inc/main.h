@@ -70,6 +70,7 @@ void Error_Handler(void);
 #define Default_Steps 	((3000U)<<(SYS_USED_STEP))
 #define Home_Steps 		((300U)<<(SYS_USED_STEP))
 #define UNKNOWN 		((4095U)<<(SYS_USED_STEP))
+#define NOT_KNOWN_POSITION (0U)
 #define MAX_POSITION 	((3200U)<<(SYS_USED_STEP))
 #define HOME_POSITION 	(0U)
 /* USER CODE END Private defines */
