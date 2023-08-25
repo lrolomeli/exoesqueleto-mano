@@ -230,17 +230,11 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 
 	if(home_routine[finger] == home)
 	{
+		// Si el dedo se dirige hacia home actuamos
 		sleep_motor(finger);
 		gfinger_params.fingers_in_pos[finger] = Yes;
 		gfinger_params.current_pos[finger] = HOME_POSITION;
 		home_routine[finger] = referenced;
-	}
-	else
-	{
-		gfinger_params.fingers_in_pos[finger] = Yes;
-		gfinger_params.current_pos[finger] = HOME_POSITION;
-		sleep_motor(finger);
-		home_routine[finger] = lost;
 	}
 }
 
