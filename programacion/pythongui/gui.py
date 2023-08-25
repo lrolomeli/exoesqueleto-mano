@@ -37,8 +37,6 @@ class Exoesqueleto(QMainWindow):
         self.ui.ring_bt.clicked.connect(self.ring)
         self.ui.little_bt.clicked.connect(self.little)
         self.ui.speed_slider.valueChanged.connect(self.speed)
-        self.ui.angle_slider.valueChanged.connect(self.gotopos)
-        self.ui.Reps_Slider.valueChanged.connect(self.reps)
         self.ui.stop_boton.clicked.connect(self.stopped)
         self.ui.start_boton.clicked.connect(self.start)
         self.speedcmd=["FB","FC","FD","FE","FF"]

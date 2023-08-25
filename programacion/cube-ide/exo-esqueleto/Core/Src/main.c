@@ -199,7 +199,6 @@ static void sinewave_fn(st_exoesk * exoesk);
 static void preset_fingers_target(st_exoesk * exoesk, uint16_t position);
 static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
-static void toggle_finger(uint8_t btcmd);
 static uint8_t is_system_referenced(void);
 static void send_home(st_exoesk * exoesk);
 static void select_all_fingers(st_exoesk * exoesk);
@@ -504,16 +503,34 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 	case reserved_major_C:
 		break;
 	case deselect_thumb:
+		gfinger_params.fingers_in_op[thumb] = No;
+		break;
 	case deselect_index:
+		gfinger_params.fingers_in_op[index] = No;
+		break;
 	case deselect_middle:
+		gfinger_params.fingers_in_op[middle] = No;
+		break;
 	case deselect_ring:
+		gfinger_params.fingers_in_op[ring] = No;
+		break;
 	case deselect_little:
+		gfinger_params.fingers_in_op[little] = No;
+		break;
 	case select_thumb:
+		gfinger_params.fingers_in_op[thumb] = Yes;
+		break;
 	case select_index:
+		gfinger_params.fingers_in_op[index] = Yes;
+		break;
 	case select_middle:
+		gfinger_params.fingers_in_op[middle] = Yes;
+		break;
 	case select_ring:
+		gfinger_params.fingers_in_op[ring] = Yes;
+		break;
 	case select_little:
-		toggle_finger(exoesk->bluetooth_command);
+		gfinger_params.fingers_in_op[little] = Yes;
 		break;
 	case stop:
 		exoesk->in_operation = No;
@@ -564,21 +581,6 @@ static void send_home(st_exoesk * exoesk)
 		motor_wakeup(finger);
 	}
 	exoesk->in_operation = Yes;
-}
-
-static void toggle_finger(uint8_t btcmd)
-{
-
-	uint8_t finger = (btcmd - deselect_thumb);
-
-	if(finger < flength){
-		gfinger_params.fingers_in_op[finger % flength] = Yes;
-	}
-	else
-	{
-		gfinger_params.fingers_in_op[finger % flength] = No;
-	}
-
 }
 
 static uint8_t is_system_referenced(void)
