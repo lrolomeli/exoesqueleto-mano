@@ -43,17 +43,28 @@ class Exoesqueleto(QMainWindow):
         self.ui.label_ring.setVisible(False)
         self.ui.label_little.setVisible(False)
         self.ui.mvdwn_bt.clicked.connect(self.move_down)
+        self.ui.mvdwn_bt.setEnabled(False)
         self.ui.mvup_bt.clicked.connect(self.move_up)
+        self.ui.mvup_bt.setEnabled(False)
         self.ui.home_bt.clicked.connect(self.home)
+        self.ui.home_bt.setEnabled(False)
         self.ui.bluetooth_bt.clicked.connect(self.connect_bluetooth)
         self.ui.indx_bt.clicked.connect(self.index)
+        self.ui.indx_bt.setEnabled(False)
         self.ui.thumb_bt.clicked.connect(self.thumb)
+        self.ui.thumb_bt.setEnabled(False)
         self.ui.middle_bt.clicked.connect(self.middle)
+        self.ui.middle_bt.setEnabled(False)
         self.ui.ring_bt.clicked.connect(self.ring)
+        self.ui.ring_bt.setEnabled(False)
         self.ui.little_bt.clicked.connect(self.little)
+        self.ui.little_bt.setEnabled(False)
         self.ui.speed_slider.valueChanged.connect(self.speed)
+        self.ui.speed_slider.setEnabled(False)
         self.ui.stop_boton.clicked.connect(self.stopped)
+        self.ui.stop_boton.setEnabled(False)
         self.ui.start_boton.clicked.connect(self.start)
+        self.ui.start_boton.setEnabled(False)
         self.ui.spinb_reps.valueChanged.connect(self.repetition)
         self.ui.spinb_initpos.valueChanged.connect(self.initpos)
         self.ui.spinb_finalpos.valueChanged.connect(self.finalpos)
@@ -80,7 +91,7 @@ class Exoesqueleto(QMainWindow):
         init = calc_steps(int(self.initialposition))
         final = calc_steps(int(self.finalposition))
         self.updateSpeedTimer()
-        self.routine(self, init, final)
+        self.routine(init, final)
 
     def gotoposition(self, position):
         self.ser.write(bytes.fromhex("05"))
@@ -90,9 +101,9 @@ class Exoesqueleto(QMainWindow):
     def routine(self, init, final):
         for i in range(self.reps):
             #print("down")
-            self.gotoposition(self, init)
+            self.gotoposition(init)
             time.sleep(self.speedtimer)
-            self.gotoposition(self, final)
+            self.gotoposition(final)
             time.sleep(self.speedtimer)
         print(self.ser)
 
@@ -116,6 +127,17 @@ class Exoesqueleto(QMainWindow):
 
     def connect_bluetooth(self):
         self.ser = serial.Serial(port='COM11', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self.ui.mvdwn_bt.setEnabled(False)
+        self.ui.mvup_bt.setEnabled(False)
+        self.ui.home_bt.setEnabled(False)
+        self.ui.indx_bt.setEnabled(False)
+        self.ui.thumb_bt.setEnabled(False)
+        self.ui.middle_bt.setEnabled(False)
+        self.ui.ring_bt.setEnabled(False)
+        self.ui.little_bt.setEnabled(False)
+        self.ui.speed_slider.setEnabled(False)
+        self.ui.stop_boton.setEnabled(False)
+        self.ui.start_boton.setEnabled(False)
         print("connected")
         
     def thumb(self):
