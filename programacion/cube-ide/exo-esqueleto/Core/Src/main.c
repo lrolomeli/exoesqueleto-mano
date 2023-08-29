@@ -562,7 +562,7 @@ static void deselect_all_fingers(st_exoesk * exoesk)
 {
 	for(uint8_t finger=thumb; finger<flength; finger++)
 	{
-		gfinger_params.fingers_in_op[finger] = Yes;
+		gfinger_params.fingers_in_op[finger] = No;
 	}
 }
 

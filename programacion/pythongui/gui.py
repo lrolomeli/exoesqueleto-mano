@@ -127,22 +127,22 @@ class Exoesqueleto(QMainWindow):
 
     def connect_bluetooth(self):
         self.ser = serial.Serial(port='COM11', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
-        self.ui.mvdwn_bt.setEnabled(False)
-        self.ui.mvup_bt.setEnabled(False)
-        self.ui.home_bt.setEnabled(False)
-        self.ui.indx_bt.setEnabled(False)
-        self.ui.thumb_bt.setEnabled(False)
-        self.ui.middle_bt.setEnabled(False)
-        self.ui.ring_bt.setEnabled(False)
-        self.ui.little_bt.setEnabled(False)
-        self.ui.speed_slider.setEnabled(False)
-        self.ui.stop_boton.setEnabled(False)
-        self.ui.start_boton.setEnabled(False)
+        self.ui.mvdwn_bt.setEnabled(True)
+        self.ui.mvup_bt.setEnabled(True)
+        self.ui.home_bt.setEnabled(True)
+        self.ui.indx_bt.setEnabled(True)
+        self.ui.thumb_bt.setEnabled(True)
+        self.ui.middle_bt.setEnabled(True)
+        self.ui.ring_bt.setEnabled(True)
+        self.ui.little_bt.setEnabled(True)
+        self.ui.speed_slider.setEnabled(True)
+        self.ui.stop_boton.setEnabled(True)
+        self.ui.start_boton.setEnabled(True)
         print("connected")
         
     def thumb(self):
         self.thumb_v = not self.thumb_v
-        if self.thumb_v:        
+        if self.thumb_v is True:        
             self.ser.write(bytes.fromhex("7A"))
         else:
             self.ser.write(bytes.fromhex("75"))
