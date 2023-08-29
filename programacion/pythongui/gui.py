@@ -6,20 +6,35 @@ import serial
 
 from exoesqueleto import Ui_MainWindow
 
+Maxsteps = 3000
+steps_per_angle = 25 
+angle = 0
+
+def calc_steps(angle):
+    steps = Maxsteps - ( steps_per_angle * angle )
+    steps = int(steps / 25)
+    steps = hex(steps)
+    value = str(steps)[2:]
+    return value
+
 class Exoesqueleto(QMainWindow):
+
     
     def __init__(self):
         super().__init__()
         self.ser = None
+        # por cada angulo que nos desplacemos nos tomara 25 milisegundos llegar en la maxima velocidad
+        self.speedval = 1 # velocidad de 1 milisegundos por paso cada angulo son 25 pasos por lo tanto
+        self.speedtimer = 4
+        self.reps = 1
+        self.initialposition = 0
+        self.finalposition = 0
         self.speedLabel = ["Muy Alta","Alta","Intermedia","Baja","Muy Baja"]
         self.thumb_v = False
         self.index_v = False
         self.middle_v = False
         self.ring_v = False
         self.little_v = False
-        self.Maxsteps=3000
-        self.steps_per_angle =25 
-        self.angle=0
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
         self.ui.label_thumb.setVisible(False)
@@ -39,32 +54,55 @@ class Exoesqueleto(QMainWindow):
         self.ui.speed_slider.valueChanged.connect(self.speed)
         self.ui.stop_boton.clicked.connect(self.stopped)
         self.ui.start_boton.clicked.connect(self.start)
+        self.ui.spinb_reps.valueChanged.connect(self.repetition)
+        self.ui.spinb_initpos.valueChanged.connect(self.initpos)
+        self.ui.spinb_finalpos.valueChanged.connect(self.finalpos)
         self.speedcmd=["FB","FC","FD","FE","FF"]
        
+    def repetition(self, value):
+        self.reps = value 
 
-    def reps(self, value):   
-        self.ui.Reps_label_2.setText(str(value))
+    def initpos(self, value):
+        self.initialposition = value
 
-    def start(self):   
-        print("start routine")
+    def finalpos(self, value):
+        self.finalposition = value
+
+    def updateSpeedTimer(self):
+        self.speedtimer = ((self.speedval * 25 * abs(self.finalposition - self.initialposition))/1000)+.5
+
+    def start(self):
+        print("\nresumen de rutina\n")
+        print("posicion inicial: " + str(self.initialposition))
+        print("posicion final: " + str(self.finalposition))
+        print("Repeticiones: " + str(self.reps))
+        print("Iniciando rutina")
+        init = calc_steps(int(self.initialposition))
+        final = calc_steps(int(self.finalposition))
+        self.updateSpeedTimer()
+        self.routine(self, init, final)
+
+    def gotoposition(self, position):
+        self.ser.write(bytes.fromhex("05"))
+        time.sleep(.5)
+        self.ser.write(bytes.fromhex(position))
+
+    def routine(self, init, final):
+        for i in range(self.reps):
+            #print("down")
+            self.gotoposition(self, init)
+            time.sleep(self.speedtimer)
+            self.gotoposition(self, final)
+            time.sleep(self.speedtimer)
+        print(self.ser)
 
     def stopped (self):
         print("stop")
         self.ser.write(bytes.fromhex("7F"))
         print(self.ser)
-    
-         
-    def gotopos(self, value):
-        self.ui.angle_label.setText(str(value))
-        steps=self.Maxsteps-(self.steps_per_angle*value)
-        steps=int(steps / 25)
-        steps=hex(steps)
-        print(str(steps)[2:])
-
-        #self.ser.write(bytes.fromhex("05"))
-        #self.ser.write(bytes.fromhex(hex(value)))
 
     def speed(self, value):
+        self.speedval = value
         self.ui.speed_label.setText(self.speedLabel[value-1])
         self.ser.write(bytes.fromhex(self.speedcmd[value-1]))
 
@@ -131,7 +169,7 @@ class Exoesqueleto(QMainWindow):
         print(self.ser)
 
     def ciclos(self):
-        for i in range(10):
+        for i in range(self.reps):
             #print("down")
             self.ser.write(bytes.fromhex("05"))
             self.ser.write(bytes.fromhex("78"))
