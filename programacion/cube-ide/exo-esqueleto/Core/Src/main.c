@@ -211,7 +211,7 @@ static void finger_default_conditions();
 static uint8_t process_cmd(st_exoesk * exoesk);
 static uint8_t fingers_in_position(void);
 static void emergency_stop(void);
-
+static void sleep_all_fingers(void);
 
 /* USER CODE END PFP */
 
@@ -469,9 +469,17 @@ static void prepare_action(st_exoesk * exoesk)
 
 	if(cmd_complete == 0)
 	{
-		steps = exoesk->bluetooth_command * 25;
-		preset_fingers_target(exoesk, steps);
-		cmd_complete = 1;
+		if(exoesk->bluetooth_command > 0x3B)
+		{
+			steps = exoesk->bluetooth_command * 25;
+			preset_fingers_target(exoesk, (steps<<SYS_USED_STEP));
+			cmd_complete = 1;
+		}
+		else
+		{
+			cmd_complete = 0;
+		}
+
 	}
 	else
 	{
@@ -533,6 +541,7 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 		gfinger_params.fingers_in_op[little] = Yes;
 		break;
 	case stop:
+		sleep_all_fingers();
 		exoesk->in_operation = No;
 
 		break;
@@ -564,6 +573,15 @@ static void deselect_all_fingers(st_exoesk * exoesk)
 	{
 		gfinger_params.fingers_in_op[finger] = No;
 	}
+}
+
+static void sleep_all_fingers(void)
+{
+	for(uint8_t finger=thumb; finger<flength; finger++)
+	{
+		sleep_motor(finger);
+	}
+
 }
 
 static void send_home(st_exoesk * exoesk)

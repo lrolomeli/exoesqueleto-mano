@@ -80,7 +80,7 @@ class Exoesqueleto(QMainWindow):
         self.finalposition = value
 
     def updateSpeedTimer(self):
-        self.speedtimer = ((self.speedval * 25 * abs(self.finalposition - self.initialposition))/1000)+.5
+        self.speedtimer = ((self.speedval * 50 * abs(self.finalposition - self.initialposition))/1000)
 
     def start(self):
         print("\nresumen de rutina\n")
