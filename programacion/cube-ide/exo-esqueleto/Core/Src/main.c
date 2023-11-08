@@ -51,12 +51,10 @@ typedef enum{
 }enum_referenced;
 
 typedef enum{
-	ReleaseHomeButtons = 0,
+	GoHome = 0,
 	WaitReleaseStage,
-	GoTowardsHomeButtons,
 	GoInitialPosition,
 	HomeRoutineComplete,
-	ErrorHoming
 }enum_home_stages;
 
 
@@ -180,8 +178,7 @@ static uint8_t times = 0;
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
-static volatile st_gfinger_params gfinger_params = { {0},{0},{0},{0} };
-static const uint8_t hfingers[9] = {index,middle,ring,0,little,0,0,0,thumb};
+static volatile st_gfinger_params gfinger_params = { {SCREW_LEN_IN_STEP},{0},{0},{0} };
 
 /* USER CODE END PV */
 
@@ -353,12 +350,11 @@ void SystemClock_Config(void)
 
 static void home_f(st_exoesk * exoesk)
 {
-	static enum_home_stages home_stage = ReleaseHomeButtons;
-	static uint16_t failure_blinking_delay = 10000;
+	static enum_home_stages home_stage = GoHome;
 
 	switch(home_stage)
 	{
-	case ReleaseHomeButtons:
+	case GoHome:
 		// Seleccionamos los dedos que queremos mover en este caso todos.
 		select_all_fingers(exoesk);
 		// Definimos el objetivo al que hay que movernos. Los pasos necesarios para despejar el boton.
@@ -374,24 +370,7 @@ static void home_f(st_exoesk * exoesk)
 			home_stage = GoTowardsHomeButtons;
 		}
 		break;
-	case GoTowardsHomeButtons:
-		if(is_system_referenced())
-		{
-			// Definimos el objetivo al que hay que movernos. Los pasos necesarios para despejar el boton.
-			preset_fingers_target(exoesk, Initial_Position);
-			home_stage = GoInitialPosition;
-		}
-		else if (exoesk->in_operation)
-		{
-			home_stage = GoTowardsHomeButtons;
-		}
-		else
-		{
-			emergency_stop();
-			finger_default_conditions();
-			home_stage = ErrorHoming;
-		}
-		break;
+
 	case GoInitialPosition:
 		if(No == exoesk->in_operation)
 		{
@@ -403,18 +382,7 @@ static void home_f(st_exoesk * exoesk)
 	case HomeRoutineComplete:
 		// Comenzamos con condiciones iniciales
 		finger_default_conditions();
-		home_stage = ReleaseHomeButtons;
-		break;
-	case ErrorHoming:
-		if(failure_blinking_delay > 0)
-		{
-			failure_blinking_delay--;
-		}
-		else
-		{
-			failure_blinking_delay = 10000;
-			HAL_GPIO_TogglePin(GPIOC, GPIO_PIN_13);
-		}
+		home_stage = GoHome;
 		break;
 	default:
 		break;
@@ -665,9 +633,9 @@ static void finger_default_conditions()
 		/* la rutina de home no se ha completado */
 		home_routine[finger] = lost;
 		/* no se conoce la posicion del motor */
-		gfinger_params.current_pos[finger] = NOT_KNOWN_POSITION;
+		gfinger_params.current_pos[finger] = SCREW_LEN_IN_STEP;
 		/* no se ha determinado la posicion a la que vamos a movernos */
-		gfinger_params.go_to[finger] = NOT_KNOWN_POSITION;
+		gfinger_params.go_to[finger] = SCREW_LEN_IN_STEP;
 		/* el dedo esta en cierta posicion y por lo tanto no se esta moviendo */
 		gfinger_params.fingers_in_pos[finger] = Yes;
 	}
@@ -695,19 +663,19 @@ static void preset_fingers_target(st_exoesk * exoesk, uint16_t position)
 		{
 			gfinger_params.fingers_in_pos[finger] = No;
 			gfinger_params.go_to[finger] = position;
-			// things to prevent
-			if (gfinger_params.current_pos[finger] < position)
+			// opc1 -> si la posicion actual es mayor a la posicion final
+			if (gfinger_params.current_pos[finger] > position)
 			{
-				// goto position is not greater than maximum position
+				set_direction(finger, Down);
+				motor_wakeup(finger);
+			}
+			else if(gfinger_params.current_pos[finger] < position)
+			{
+				// si la posicion final es mayor al maximo
 				if(MAX_POSITION < position)
 				{
 					gfinger_params.go_to[finger] = MAX_POSITION;
 				}
-				set_direction(finger, Down);
-				motor_wakeup(finger);
-			}
-			else if(gfinger_params.current_pos[finger] > position)
-			{
 				set_direction(finger, Up);
 				motor_wakeup(finger);
 			}
