@@ -423,17 +423,8 @@ static void prepare_action(st_exoesk * exoesk)
 
 	if(cmd_complete == 0)
 	{
-		if(exoesk->bluetooth_command > 0x3B)
-		{
-			steps = exoesk->bluetooth_command * 25;
-			preset_fingers_target(exoesk, (steps<<SYS_USED_STEP));
-			cmd_complete = 1;
-		}
-		else
-		{
-			cmd_complete = 0;
-		}
-
+		steps = exoesk->bluetooth_command * 25;
+		preset_fingers_target(exoesk, (steps<<SYS_USED_STEP));
 	}
 	else
 	{
