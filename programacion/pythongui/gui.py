@@ -6,14 +6,10 @@ import serial
 
 from exoesqueleto import Ui_MainWindow
 
-Maxsteps = 3000
-steps_per_angle = 25 
 angle = 0
 
 def calc_steps(angle):
-    steps = Maxsteps - ( steps_per_angle * angle )
-    steps = int(steps / 25)
-    steps = hex(steps)
+    steps = hex(angle)
     value = str(steps)[2:]
     return value
 

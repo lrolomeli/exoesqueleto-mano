@@ -488,7 +488,7 @@
      </rect>
     </property>
     <property name="maximum">
-     <number>60</number>
+     <number>120</number>
     </property>
    </widget>
    <widget class="QSpinBox" name="spinb_finalpos">
@@ -501,7 +501,7 @@
      </rect>
     </property>
     <property name="maximum">
-     <number>60</number>
+     <number>120</number>
     </property>
    </widget>
    <widget class="QLabel" name="label_4">
