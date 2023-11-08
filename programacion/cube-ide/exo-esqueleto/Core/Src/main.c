@@ -146,7 +146,6 @@ typedef struct {
 	const st_gpio_config_t step;
 	const st_gpio_config_t direction;
 	const st_gpio_config_t sleep;
-	const st_gpio_config_t home;
 }st_fconfig;
 
 typedef void(*func_ptr_t)(st_exoesk * exoesk);
@@ -170,11 +169,11 @@ typedef void(*func_ptr_t)(st_exoesk * exoesk);
 
 static const st_fconfig exoconfig[flength] = {
 	/*       steps               direction                sleep                 home          */
-	{ {portA, GPIO_PIN_1}, 	{portA, GPIO_PIN_0},   {portB, GPIO_PIN_4},	 {portB, GPIO_PIN_9} },//thumb
-	{ {portB, GPIO_PIN_14},	{portB, GPIO_PIN_13},  {portB, GPIO_PIN_15}, {portB, GPIO_PIN_5} },//index
-	{ {portB, GPIO_PIN_1}, 	{portB, GPIO_PIN_0},   {portA, GPIO_PIN_8},	 {portB, GPIO_PIN_6} },//middle
-	{ {portA, GPIO_PIN_6}, 	{portA, GPIO_PIN_5},   {portA, GPIO_PIN_7},	 {portB, GPIO_PIN_7} },//ring
-	{ {portA, GPIO_PIN_3}, 	{portA, GPIO_PIN_2},   {portB, GPIO_PIN_3},	 {portB, GPIO_PIN_8} }//little
+	{ {portA, GPIO_PIN_1}, 	{portA, GPIO_PIN_0},   {portB, GPIO_PIN_4},	},//thumb
+	{ {portB, GPIO_PIN_14},	{portB, GPIO_PIN_13},  {portB, GPIO_PIN_15}, },//index
+	{ {portB, GPIO_PIN_1}, 	{portB, GPIO_PIN_0},   {portA, GPIO_PIN_8},	},//middle
+	{ {portA, GPIO_PIN_6}, 	{portA, GPIO_PIN_5},   {portA, GPIO_PIN_7},	},//ring
+	{ {portA, GPIO_PIN_3}, 	{portA, GPIO_PIN_2},   {portB, GPIO_PIN_3} }//little
 };
 
 static uint8_t times = 0;
@@ -219,23 +218,6 @@ static void sleep_all_fingers(void);
 /* USER CODE BEGIN 0 */
 
 static const func_ptr_t fsm_state[2] = {home_f, idle_f};
-
-void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
-{
-	uint8_t finger = 0;
-
-	GPIO_Pin = GPIO_Pin >> 6;
-	finger = hfingers[GPIO_Pin];
-
-	if(home_routine[finger] == home)
-	{
-		// Si el dedo se dirige hacia home actuamos
-		sleep_motor(finger);
-		gfinger_params.fingers_in_pos[finger] = Yes;
-		gfinger_params.current_pos[finger] = HOME_POSITION;
-		home_routine[finger] = referenced;
-	}
-}
 
 void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart){
 	//waits until buffer is empty again
