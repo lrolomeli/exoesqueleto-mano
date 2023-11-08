@@ -195,8 +195,6 @@ static void sinewave_fn(st_exoesk * exoesk);
 static void preset_fingers_target(st_exoesk * exoesk, uint16_t position);
 static void alive_fn(void);
 static void send_step_pulses(st_exoesk * exoesk);
-static uint8_t is_system_referenced(void);
-static void send_home(st_exoesk * exoesk);
 static void select_all_fingers(st_exoesk * exoesk);
 static void deselect_all_fingers(st_exoesk * exoesk);
 static void prepare_action(st_exoesk * exoesk);
@@ -351,14 +349,16 @@ void SystemClock_Config(void)
 static void home_f(st_exoesk * exoesk)
 {
 	static enum_home_stages home_stage = GoHome;
+	uint8_t finger = thumb;
 
 	switch(home_stage)
 	{
 	case GoHome:
 		// Seleccionamos los dedos que queremos mover en este caso todos.
 		select_all_fingers(exoesk);
-		// Definimos el objetivo al que hay que movernos. Los pasos necesarios para despejar el boton.
-		preset_fingers_target(exoesk, Clear_Button_Distance);
+		// Situacion actual nos encontramos en la posicion 4095
+		// Objetivo: movernos hacia la posicion CERO (0) (home)
+		preset_fingers_target(exoesk, ZERO_POSITION);
 		// Esperar a que se despejen los motores
 		home_stage = WaitReleaseStage;
 		break;
@@ -366,14 +366,18 @@ static void home_f(st_exoesk * exoesk)
 		if(No == exoesk->in_operation)
 		{
 			// Definimos el objetivo al que hay que movernos. Los pasos necesarios para volver al boton
-			send_home(exoesk);
-			home_stage = GoTowardsHomeButtons;
+			preset_fingers_target(exoesk, HOME_POSITION);
+			home_stage = GoInitialPosition;
 		}
 		break;
 
 	case GoInitialPosition:
 		if(No == exoesk->in_operation)
 		{
+			for(finger=thumb; finger<flength; finger++)
+			{
+				home_routine[finger] = referenced;
+			}
 			deselect_all_fingers(exoesk);
 			home_stage = HomeRoutineComplete;
 			exoesk->fsm_state = idle_fs;
@@ -447,10 +451,10 @@ static uint8_t process_cmd(st_exoesk * exoesk)
 		exoesk->fsm_state = home_fs;
 		break;
 	case all_way_down:
-		preset_fingers_target(exoesk, MAX_POSITION);
+		preset_fingers_target(exoesk, ZERO_POSITION);
 		break;
 	case all_way_up:
-		preset_fingers_target(exoesk, HOME_POSITION);
+		preset_fingers_target(exoesk, MAX_POSITION);
 		break;
 	case sinewave:
 		sinewave_fn(exoesk);
@@ -531,40 +535,6 @@ static void sleep_all_fingers(void)
 	{
 		sleep_motor(finger);
 	}
-
-}
-
-static void send_home(st_exoesk * exoesk)
-{
-	uint8_t finger=thumb;
-	for(finger=thumb; finger<flength; finger++)
-	{
-		gfinger_params.current_pos[finger] = UNDEFINED;
-		gfinger_params.go_to[finger] = HOME_POSITION;
-
-		home_routine[finger] = home;
-		gfinger_params.fingers_in_pos[finger] = No;
-
-		set_direction(finger, Up);
-		motor_wakeup(finger);
-	}
-	exoesk->in_operation = Yes;
-}
-
-static uint8_t is_system_referenced(void)
-{
-	if(home_routine[thumb] == referenced &&
-		home_routine[index] == referenced &&
-		home_routine[middle] == referenced &&
-		home_routine[ring] == referenced &&
-		home_routine[little] == referenced)
-	{
-		return Yes;
-	}
-	else
-	{
-		return No;
-	}
 }
 
 static void send_step_pulses(st_exoesk * exoesk)
@@ -635,7 +605,7 @@ static void finger_default_conditions()
 		/* no se conoce la posicion del motor */
 		gfinger_params.current_pos[finger] = SCREW_LEN_IN_STEP;
 		/* no se ha determinado la posicion a la que vamos a movernos */
-		gfinger_params.go_to[finger] = SCREW_LEN_IN_STEP;
+		gfinger_params.go_to[finger] = ZERO_POSITION;
 		/* el dedo esta en cierta posicion y por lo tanto no se esta moviendo */
 		gfinger_params.fingers_in_pos[finger] = Yes;
 	}

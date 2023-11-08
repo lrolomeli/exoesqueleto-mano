@@ -67,13 +67,13 @@ void Error_Handler(void);
 
 #define SYS_USED_STEP (Half_Step)
 
-#define SCREW_LEN_IN_STEP ((3200U)<<(SYS_USED_STEP))
+#define SCREW_LEN_IN_STEP ((4095)<<(SYS_USED_STEP))
 #define Initial_Position 	((3000U)<<(SYS_USED_STEP))
-#define Clear_Button_Distance 		((300U)<<(SYS_USED_STEP))
+#define HOME_POSITION 		((300U)<<(SYS_USED_STEP))
 #define UNDEFINED 		((4095U)<<(SYS_USED_STEP))
 #define NOT_KNOWN_POSITION (0U)
 #define MAX_POSITION 	((3200U)<<(SYS_USED_STEP))
-#define HOME_POSITION 	(0U)
+#define ZERO_POSITION 	(0U)
 /* USER CODE END Private defines */
 
 #ifdef __cplusplus
