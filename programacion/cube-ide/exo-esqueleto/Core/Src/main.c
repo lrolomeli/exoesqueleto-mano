@@ -178,7 +178,7 @@ static uint8_t times = 0;
 static volatile uint8_t timeout_flg = 0;
 static volatile enum_motor_status home_routine[flength] = {lost};
 static volatile enum_buffer_status buffer_status = empty;
-static volatile st_gfinger_params gfinger_params = { {SCREW_LEN_IN_STEP},{0},{0},{0} };
+static volatile st_gfinger_params gfinger_params = { {0},{0},{0},{0} };
 
 /* USER CODE END PV */
 
@@ -274,7 +274,7 @@ int main(void)
 	htim3.Init.Period = htim3.Init.Period >> (normal);
 	HAL_TIM_Base_Start_IT(&htim3);
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
-
+	finger_default_conditions();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -425,6 +425,7 @@ static void prepare_action(st_exoesk * exoesk)
 	{
 		steps = exoesk->bluetooth_command * 25;
 		preset_fingers_target(exoesk, (steps<<SYS_USED_STEP));
+		cmd_complete = 1;
 	}
 	else
 	{

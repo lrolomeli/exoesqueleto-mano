@@ -399,7 +399,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Posicion inicial</string>
+     <string>1era Posicion °</string>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
@@ -519,7 +519,7 @@
      </font>
     </property>
     <property name="text">
-     <string>Posicion final</string>
+     <string>2da Posicion °</string>
     </property>
    </widget>
    <widget class="QSpinBox" name="spinb_reps">

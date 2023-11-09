@@ -11,6 +11,9 @@ angle = 0
 def calc_steps(angle):
     steps = hex(angle)
     value = str(steps)[2:]
+    if angle < 16:
+        value = "0"+value
+    print(type(value))
     return value
 
 class Exoesqueleto(QMainWindow):
@@ -114,15 +117,18 @@ class Exoesqueleto(QMainWindow):
         self.ser.write(bytes.fromhex(self.speedcmd[value-1]))
 
     def closeEvent(self, event):
+        self.deselect_all()
+        print("bueno adios!")
         if self.ser is not None:
             print(self.ser)
             self.ser.close()
             print(self.ser)
-        print("hola")
+        
+
         event.accept() # let the window close
 
     def connect_bluetooth(self):
-        self.ser = serial.Serial(port='COM11', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
+        self.ser = serial.Serial(port='COM3', baudrate=9600, parity=serial.PARITY_NONE, stopbits=serial.STOPBITS_ONE, bytesize=serial.EIGHTBITS)
         self.ui.mvdwn_bt.setEnabled(True)
         self.ui.mvup_bt.setEnabled(True)
         self.ui.home_bt.setEnabled(True)
@@ -135,6 +141,7 @@ class Exoesqueleto(QMainWindow):
         self.ui.stop_boton.setEnabled(True)
         self.ui.start_boton.setEnabled(True)
         print("connected")
+        print(self.ser)
         
     def thumb(self):
         self.thumb_v = not self.thumb_v
@@ -143,6 +150,22 @@ class Exoesqueleto(QMainWindow):
         else:
             self.ser.write(bytes.fromhex("75"))
         self.ui.label_thumb.setVisible(self.thumb_v)
+
+    def deselect_all(self):
+        print("cerrando en 5")
+        self.ser.write(bytes.fromhex("75"))
+        time.sleep(1)
+        print("cerrando en 4")
+        self.ser.write(bytes.fromhex("76"))
+        time.sleep(1)
+        print("cerrando en 3")
+        self.ser.write(bytes.fromhex("77"))
+        time.sleep(1)
+        print("cerrando en 2")
+        self.ser.write(bytes.fromhex("78"))
+        time.sleep(1)
+        print("cerrando en 1")
+        self.ser.write(bytes.fromhex("79"))
 
     def index(self):
         self.index_v = not self.index_v

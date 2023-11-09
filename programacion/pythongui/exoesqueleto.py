@@ -207,10 +207,10 @@ class Ui_MainWindow(object):
         self.label_little.setText("")
         self.label.setText(QCoreApplication.translate("MainWindow", u"Velocidad", None))
         self.speed_label.setText(QCoreApplication.translate("MainWindow", u"Muy Alta", None))
-        self.label_3.setText(QCoreApplication.translate("MainWindow", u"Posicion inicial", None))
+        self.label_3.setText(QCoreApplication.translate("MainWindow", u"1era Posicion \u00b0", None))
         self.label_2.setText(QCoreApplication.translate("MainWindow", u"Repeticiones", None))
         self.stop_boton.setText("")
         self.start_boton.setText("")
-        self.label_4.setText(QCoreApplication.translate("MainWindow", u"Posicion final", None))
+        self.label_4.setText(QCoreApplication.translate("MainWindow", u"2da Posicion \u00b0", None))
     # retranslateUi
 

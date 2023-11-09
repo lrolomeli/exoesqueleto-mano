@@ -1,0 +1,64 @@
+import pyaudio
+import wave
+
+chunk = 1024
+sample_format = pyaudio.paInt16
+channels = 2
+fs = 44100
+seconds = 5
+
+p = pyaudio.PyAudio()
+
+stream = p.open(format=sample_format,
+                channels=channels,
+                rate=fs,
+                frames_per_buffer=chunk,
+                input=True)
+
+frames = []
+
+for i in range(0, int(fs / chunk * seconds)):
+    data = stream.read(chunk)
+    frames.append(data)
+
+stream.stop_stream()
+stream.close()
+
+p.terminate()
+
+# Guarda la grabación en un archivo WAV
+wf = wave.open("grabacion.wav", 'wb')
+wf.setnchannels(channels)
+wf.setsampwidth(p.get_sample_size(sample_format))
+wf.setframerate(fs)
+wf.writeframes(b''.join(frames))
+wf.close()
+import speech_recognition as sr
+
+r = sr.Recognizer()
+
+# Lee el archivo de audio
+audio_file = "grabacion.wav"
+
+with sr.AudioFile(audio_file) as source:
+    audio_text = r.recognize_google(source)
+
+print("Texto reconocido:", audio_text)
+import re
+
+# Encuentra todas las vocales en el texto
+vocales = re.findall('[aeiouAEIOU]', audio_text)
+
+# Toma las primeras tres vocales
+tres_vocales = vocales[:3]
+
+print("Tres vocales identificadas:", tres_vocales)
+import matplotlib.pyplot as plt
+
+# Grafica las vocales
+plt.figure(figsize=(8, 4))
+plt.bar(range(3), [1] * 3, tick_label=tres_vocales)
+plt.xlabel("Vocales")
+plt.ylabel("Frecuencia")
+plt.title("Secuencia de las Tres Vocales")
+plt.show()
